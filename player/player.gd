@@ -23,8 +23,11 @@ extends CharacterBody3D
 @export_group("Jumping")
 ## Peak jump height, in meters.
 @export var jump_height: float = 1.2
-## Multiplies the project's gravity. Above 1 makes falling feel heavier.
-@export var gravity_multiplier: float = 1.5
+## Multiplies the project's gravity. Higher = quicker, less floaty jumps.
+@export var gravity_multiplier: float = 2.0
+## Extra gravity while falling, so you come down faster than you go up.
+## 1 = same as rising. Higher = snappier landings.
+@export var fall_gravity_multiplier: float = 1.6
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
@@ -36,8 +39,10 @@ func _physics_process(delta: float) -> void:
 	var gravity := _gravity * gravity_multiplier
 
 	# --- Gravity ---
+	# Falling (moving downward) uses stronger gravity than rising.
 	if not is_on_floor():
-		velocity.y -= gravity * delta
+		var fall_boost := fall_gravity_multiplier if velocity.y < 0.0 else 1.0
+		velocity.y -= gravity * fall_boost * delta
 
 	# --- Jump ---
 	# Physics formula: the launch speed needed to reach jump_height.
