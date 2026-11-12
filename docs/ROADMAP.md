@@ -18,7 +18,7 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 1. [x] Player controller: movement, camera, jump, sprint
 2. [x] Interaction: look at a thing, press a key
 3. [x] Resources and gathering
-4. [ ] Inventory  ← next
+4. [ ] Inventory  ← current
 5. [ ] Crafting (by hand, then at stations)
 6. [ ] Building
 7. [ ] Survival pressure (health, hunger, stamina)

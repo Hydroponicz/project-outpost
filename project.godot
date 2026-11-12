@@ -118,6 +118,12 @@ interact={
 , Object(InputEventJoypadButton,"device":-1,"button_index":2,"pressed":false,"script":null)
 ]
 }
+inventory={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":4194306,"script":null)
+, Object(InputEventJoypadButton,"device":-1,"button_index":4,"pressed":false,"script":null)
+]
+}
 toggle_mouse_capture={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194305,"script":null)

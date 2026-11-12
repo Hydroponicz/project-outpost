@@ -1,15 +1,17 @@
 class_name ItemCollector
 extends Area3D
 ## Lives on the player. Any ItemPickup that enters this area (and is ready)
-## gets vacuumed in. The area's sphere size is the pickup range.
+## gets vacuumed into the inventory. The area's sphere size is the pickup range.
 ##
-## TEMPORARY: collected items go into a simple tally ("counts") until the
-## real inventory arrives in step 4. A weight limit will also hook in here.
+## Pieces only fly in if they fit. Weight never blocks pickup: being over
+## the weight limit just makes you encumbered.
 
-signal item_collected(item: ItemData, amount: int)
+## Emitted (at most twice a second) when items are nearby but don't fit.
+signal pickup_blocked
 
-## Temporary tally: ItemData -> amount.
-var counts: Dictionary = {}
+@export var inventory: Inventory
+
+var _last_blocked_ms: int = -100000
 
 
 func _physics_process(_delta: float) -> void:
@@ -17,8 +19,12 @@ func _physics_process(_delta: float) -> void:
 	# range and only become ready later still get picked up.
 	for body in get_overlapping_bodies():
 		var pickup := body as ItemPickup
-		if pickup != null and pickup.can_be_collected():
+		if pickup == null or not pickup.can_be_collected():
+			continue
+		if inventory.can_add(pickup.item, pickup.amount):
 			pickup.start_attract(self)
+		else:
+			_report_blocked()
 
 
 ## Where pickups fly to.
@@ -26,6 +32,19 @@ func get_attract_point() -> Vector3:
 	return global_position
 
 
-func collect(pickup: ItemPickup) -> void:
-	counts[pickup.item] = counts.get(pickup.item, 0) + pickup.amount
-	item_collected.emit(pickup.item, pickup.amount)
+## Called when a pickup arrives. Returns false if it no longer fits
+## (e.g. several pieces were flying in and the last slot filled up).
+func collect(pickup: ItemPickup) -> bool:
+	var leftover := inventory.add_item(pickup.item, pickup.amount)
+	if leftover > 0:
+		pickup.amount = leftover
+		_report_blocked()
+		return false
+	return true
+
+
+func _report_blocked() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_blocked_ms > 500:
+		_last_blocked_ms = now
+		pickup_blocked.emit()

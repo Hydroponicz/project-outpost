@@ -17,11 +17,15 @@ extends RigidBody3D
 var _age: float = 0.0
 var _collector: ItemCollector = null
 var _attract_speed: float = 0.0
+var _normal_layer: int
+var _normal_mask: int
 
 @onready var _mesh: MeshInstance3D = $Mesh
 
 
 func _ready() -> void:
+	_normal_layer = collision_layer
+	_normal_mask = collision_mask
 	var material := StandardMaterial3D.new()
 	material.albedo_color = item.drop_color if item else Color.WHITE
 	_mesh.material_override = material
@@ -55,10 +59,23 @@ func _physics_process(delta: float) -> void:
 	var step := _attract_speed * delta
 
 	if distance <= maxf(collect_distance, step):
-		_collector.collect(self)
-		queue_free()
+		if _collector.collect(self):
+			queue_free()
+		else:
+			_drop_back()  # Didn't fit after all.
 		return
 
 	global_position += to_target / distance * step
 	# Shrink as it gets close, for a satisfying "slurp".
 	_mesh.scale = Vector3.ONE * clampf(distance / 1.5, 0.3, 1.0)
+
+
+## Turns physics back on and lets the piece fall where it is.
+func _drop_back() -> void:
+	_collector = null
+	_age = 0.0  # Wait the pickup delay again before retrying.
+	freeze = false
+	collision_layer = _normal_layer
+	collision_mask = _normal_mask
+	linear_velocity = Vector3.ZERO
+	_mesh.scale = Vector3.ONE

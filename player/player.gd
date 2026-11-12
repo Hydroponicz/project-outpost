@@ -11,6 +11,8 @@ extends CharacterBody3D
 @export var walk_speed: float = 4.0
 ## Speed while holding sprint.
 @export var sprint_speed: float = 7.5
+## Speed while carrying more than the weight limit (no sprinting).
+@export var encumbered_speed: float = 2.0
 ## How quickly the player reaches full speed. Higher = snappier.
 @export var acceleration: float = 30.0
 ## How quickly the player stops when you let go. Higher = less sliding.
@@ -29,6 +31,10 @@ extends CharacterBody3D
 ## 1 = same as rising. Higher = snappier landings.
 @export var fall_gravity_multiplier: float = 1.6
 
+## False while a menu (like the inventory) is open: the character ignores
+## movement input but still falls and slows to a stop.
+var controls_enabled: bool = true
+
 ## Gamepad sprint is a toggle: click the left stick to start, and it stops
 ## when you let go of the stick (or click again).
 var _sprint_toggled: bool = false
@@ -37,6 +43,18 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 @onready var _visual: Node3D = $Visual
 @onready var _camera_rig: CameraRig = $CameraRig
+@onready var _interactor: Interactor = $Interactor
+@onready var _inventory: Inventory = $Inventory
+
+
+## Turns player control (movement, camera, hitting, interacting) on or off.
+## Menus call this when they open and close.
+func set_controls_enabled(enabled: bool) -> void:
+	controls_enabled = enabled
+	_camera_rig.input_enabled = enabled
+	_interactor.enabled = enabled
+	if not enabled:
+		_sprint_toggled = false
 
 
 func _physics_process(delta: float) -> void:
@@ -50,13 +68,15 @@ func _physics_process(delta: float) -> void:
 
 	# --- Jump ---
 	# Physics formula: the launch speed needed to reach jump_height.
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if controls_enabled and Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = sqrt(2.0 * gravity * jump_height)
 
 	# --- Read input ---
 	# Input.get_vector returns a 2D direction from WASD or the left stick.
 	# On a stick, a light push gives a value shorter than 1, so walking slowly works.
-	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	var input := Vector2.ZERO
+	if controls_enabled:
+		input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 
 	# Rotate the input so "forward" means "the way the camera is facing".
 	var camera_yaw := Basis(Vector3.UP, _camera_rig.yaw)
@@ -64,14 +84,19 @@ func _physics_process(delta: float) -> void:
 
 	# --- Sprint ---
 	# Keyboard: hold Shift. Gamepad: click the stick to toggle.
-	if Input.is_action_just_pressed("sprint_toggle"):
+	if controls_enabled and Input.is_action_just_pressed("sprint_toggle"):
 		_sprint_toggled = not _sprint_toggled
 	if input.length() < 0.1:
 		_sprint_toggled = false  # Stopped moving, so stop sprinting.
-	var sprinting := Input.is_action_pressed("sprint") or _sprint_toggled
+	var sprinting := (controls_enabled and Input.is_action_pressed("sprint")) or _sprint_toggled
 
 	# --- Horizontal movement ---
-	var speed := sprint_speed if sprinting else walk_speed
+	var speed := walk_speed
+	if _inventory.is_overweight():
+		speed = encumbered_speed  # Too heavy: slow, and no sprinting.
+		_sprint_toggled = false
+	elif sprinting:
+		speed = sprint_speed
 	var target_velocity := move_dir * speed
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 

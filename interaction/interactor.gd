@@ -33,6 +33,8 @@ signal target_changed(target: Node3D)
 
 ## The physics body currently targeted, or null.
 var target: Node3D = null
+## False while a menu is open: no targeting, hitting or interacting.
+var enabled: bool = true
 
 var _cooldown_left: float = 0.0
 ## Set by a click that grabs the mouse back (after Esc). Stays true until the
@@ -47,6 +49,12 @@ func _physics_process(delta: float) -> void:
 	if target != null and not is_instance_valid(target):
 		target = null
 		target_changed.emit(null)
+
+	if not enabled:
+		if target != null:
+			target = null
+			target_changed.emit(null)
+		return
 
 	var new_target := _find_target()
 	if new_target != target:
@@ -65,7 +73,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("interact") and target != null:
+	if enabled and event.is_action_pressed("interact") and target != null:
 		var interactable := Interactable.find_on(target)
 		if interactable != null:
 			interactable.interact(body)

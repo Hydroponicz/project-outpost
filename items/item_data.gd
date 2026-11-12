@@ -12,5 +12,7 @@ extends Resource
 @export var display_name: String = "Item"
 ## How many fit in one inventory slot.
 @export var max_stack: int = 50
+## Weight of ONE of this item. Carrying more than the limit makes you slow.
+@export var weight: float = 1.0
 ## Gray-box placeholder: color of the dropped item cube until real art exists.
 @export var drop_color: Color = Color.WHITE
