@@ -48,7 +48,7 @@ func _shake() -> void:
 
 
 func _break() -> void:
-	for i in drop_count:
+	for _i in drop_count:
 		var pickup: ItemPickup = PICKUP_SCENE.instantiate()
 		pickup.item = item
 		get_parent().add_child(pickup)
