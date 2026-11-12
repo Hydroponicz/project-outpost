@@ -29,12 +29,15 @@ signal target_changed(target: Node3D)
 ## Damage per hit. Bare hands = 1. Tools will raise this in a later step.
 @export var hit_damage: int = 1
 ## Seconds between swings. Holding the hit button keeps swinging.
-@export var hit_cooldown: float = 0.6
+@export var hit_cooldown: float = 0.8
 
 ## The physics body currently targeted, or null.
 var target: Node3D = null
 
 var _cooldown_left: float = 0.0
+## True after the mouse was freed (Esc). Stays true until the hit button is
+## released, so the click that grabs the mouse back doesn't swing.
+var _hit_blocked: bool = false
 
 
 func _physics_process(delta: float) -> void:
@@ -62,12 +65,18 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _try_hit() -> void:
-	if _cooldown_left > 0.0 or target == null:
-		return
-	if not Input.is_action_pressed("hit"):
-		return
-	# A click that just recaptures the mouse shouldn't count as a hit.
+	var holding := Input.is_action_pressed("hit")
+
+	# While the mouse is free, no hitting. Once it's grabbed again, wait for
+	# the button to be released before allowing a swing.
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not InputPrompts.using_gamepad:
+		_hit_blocked = true
+	if _hit_blocked:
+		if holding:
+			return
+		_hit_blocked = false
+
+	if not holding or _cooldown_left > 0.0 or target == null:
 		return
 	var hittable := Hittable.find_on(target)
 	if hittable == null:

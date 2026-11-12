@@ -6,7 +6,7 @@ extends RigidBody3D
 @export var item: ItemData
 @export var amount: int = 1
 ## Seconds after spawning before it can be picked up.
-@export var pickup_delay: float = 0.6
+@export var pickup_delay: float = 1.5
 ## How fast the vacuum speeds up, in meters per second, per second.
 @export var attract_acceleration: float = 40.0
 ## Starting speed of the vacuum.
