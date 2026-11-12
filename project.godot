@@ -106,6 +106,12 @@ zoom_out_hold={
 "events": [Object(InputEventJoypadButton,"device":-1,"button_index":12,"pressed":false,"script":null)
 ]
 }
+hit={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"device":-1,"button_index":1,"pressed":true,"script":null)
+, Object(InputEventJoypadMotion,"device":-1,"axis":5,"axis_value":1.0,"script":null)
+]
+}
 interact={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":69,"script":null)
@@ -118,6 +124,12 @@ toggle_mouse_capture={
 , Object(InputEventJoypadButton,"device":-1,"button_index":6,"pressed":false,"script":null)
 ]
 }
+
+[layer_names]
+
+3d_physics/layer_1="World"
+3d_physics/layer_2="Player"
+3d_physics/layer_3="Pickups"
 
 [physics]
 
