@@ -35,8 +35,8 @@ signal target_changed(target: Node3D)
 var target: Node3D = null
 
 var _cooldown_left: float = 0.0
-## True after the mouse was freed (Esc). Stays true until the hit button is
-## released, so the click that grabs the mouse back doesn't swing.
+## Set by a click that grabs the mouse back (after Esc). Stays true until the
+## button is released, so that click doesn't also swing.
 var _hit_blocked: bool = false
 
 
@@ -56,6 +56,14 @@ func _physics_process(delta: float) -> void:
 	_try_hit()
 
 
+func _input(event: InputEvent) -> void:
+	# _input runs BEFORE the camera's _unhandled_input grabs the mouse, so
+	# here the mouse is still free and we can tell this click is a "grab" click.
+	if event is InputEventMouseButton and event.pressed \
+			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		_hit_blocked = true
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact") and target != null:
 		var interactable := Interactable.find_on(target)
@@ -67,10 +75,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _try_hit() -> void:
 	var holding := Input.is_action_pressed("hit")
 
-	# While the mouse is free, no hitting. Once it's grabbed again, wait for
-	# the button to be released before allowing a swing.
-	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not InputPrompts.using_gamepad:
-		_hit_blocked = true
+	# Ignore the grab click until it's released.
 	if _hit_blocked:
 		if holding:
 			return
