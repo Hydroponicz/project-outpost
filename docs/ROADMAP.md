@@ -11,12 +11,14 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 - Valheim-style camera: always follows the mouse, character turns to face movement
 - Gamepad supported from day one (every action has a keyboard and a gamepad binding)
 - Goal: commercially viable 1.0
+- Resources do not regrow by themselves; trees are replanted by the player (later)
+- Dropped items are separate pieces, auto-vacuumed into the player when in range
 
 ## Systems (built in order, each one finished before the next)
 1. [x] Player controller: movement, camera, jump, sprint
 2. [x] Interaction: look at a thing, press a key
-3. [ ] Resources and gathering  ← next
-4. [ ] Inventory
+3. [x] Resources and gathering
+4. [ ] Inventory  ← next
 5. [ ] Crafting (by hand, then at stations)
 6. [ ] Building
 7. [ ] Survival pressure (health, hunger, stamina)
@@ -25,6 +27,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 10. [ ] Recruitment
 
 ## Later, maybe (not now)
+- Replanting trees from saplings/seeds (trees never regrow on their own; also a worker job)
+- Weight limit on carried items (with inventory or survival)
 - Combat, enemies, bosses
 - Biomes
 - Multiplayer

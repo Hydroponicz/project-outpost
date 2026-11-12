@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="1_player"]
 [ext_resource type="Texture2D" path="res://assets/textures/grid_checker.png" id="2_grid"]
 [ext_resource type="PackedScene" path="res://world/test_box.tscn" id="3_test_box"]
+[ext_resource type="PackedScene" path="res://world/resources/tree.tscn" id="4_tree"]
+[ext_resource type="PackedScene" path="res://world/resources/rock.tscn" id="5_rock"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 
@@ -152,3 +154,35 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, -4)
 
 [node name="TestBox_BehindWall" parent="InteractionTests" instance=ExtResource("3_test_box")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15.5)
+
+[node name="Resources" type="Node3D" parent="."]
+
+[node name="Tree_1" parent="Resources" instance=ExtResource("4_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 12)
+
+[node name="Tree_2" parent="Resources" instance=ExtResource("4_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 15)
+
+[node name="Tree_3" parent="Resources" instance=ExtResource("4_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 17)
+
+[node name="Tree_4" parent="Resources" instance=ExtResource("4_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 10)
+
+[node name="Tree_5" parent="Resources" instance=ExtResource("4_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 19)
+
+[node name="Tree_6" parent="Resources" instance=ExtResource("4_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 17)
+
+[node name="Rock_1" parent="Resources" instance=ExtResource("5_rock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 13)
+
+[node name="Rock_2" parent="Resources" instance=ExtResource("5_rock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 16)
+
+[node name="Rock_3" parent="Resources" instance=ExtResource("5_rock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 18)
+
+[node name="Rock_4" parent="Resources" instance=ExtResource("5_rock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 11)

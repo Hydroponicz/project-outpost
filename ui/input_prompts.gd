@@ -28,12 +28,34 @@ func _input(event: InputEvent) -> void:
 ## Returns the label for an action's button on the current device.
 func get_label(action: StringName) -> String:
 	for event in InputMap.action_get_events(action):
-		if using_gamepad and event is InputEventJoypadButton:
-			return _joy_button_name((event as InputEventJoypadButton).button_index)
-		if not using_gamepad and event is InputEventKey:
-			var physical := (event as InputEventKey).physical_keycode
-			return OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(physical))
+		if using_gamepad:
+			if event is InputEventJoypadButton:
+				return _joy_button_name((event as InputEventJoypadButton).button_index)
+			if event is InputEventJoypadMotion:
+				return _joy_axis_name((event as InputEventJoypadMotion).axis)
+		else:
+			if event is InputEventKey:
+				var physical := (event as InputEventKey).physical_keycode
+				return OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(physical))
+			if event is InputEventMouseButton:
+				return _mouse_button_name((event as InputEventMouseButton).button_index)
 	return "?"
+
+
+func _mouse_button_name(index: int) -> String:
+	match index:
+		MOUSE_BUTTON_LEFT: return "LMB"
+		MOUSE_BUTTON_RIGHT: return "RMB"
+		MOUSE_BUTTON_MIDDLE: return "MMB"
+	return "Mouse %d" % index
+
+
+func _joy_axis_name(axis: int) -> String:
+	var ps := _is_playstation()
+	match axis:
+		JOY_AXIS_TRIGGER_LEFT: return "L2" if ps else "LT"
+		JOY_AXIS_TRIGGER_RIGHT: return "R2" if ps else "RT"
+	return "Axis %d" % axis
 
 
 func _joy_button_name(index: int) -> String:
