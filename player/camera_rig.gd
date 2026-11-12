@@ -44,6 +44,9 @@ extends Node3D
 var yaw: float = 0.0
 var pitch: float = deg_to_rad(-15.0)
 
+## False while a menu is open: the camera stops reacting to look/zoom input.
+var input_enabled: bool = true
+
 var _target_distance: float
 
 @onready var _pitch_pivot: Node3D = $PitchPivot
@@ -66,6 +69,9 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not input_enabled:
+		return
+
 	# Esc / Start frees the mouse. Clicking the game window grabs it again.
 	if event.is_action_pressed("toggle_mouse_capture"):
 		_set_mouse_captured(Input.mouse_mode != Input.MOUSE_MODE_CAPTURED)
@@ -93,14 +99,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	# Right stick look.
-	var look := Input.get_vector("camera_left", "camera_right", "camera_up", "camera_down")
+	var look := Vector2.ZERO
+	if input_enabled:
+		look = Input.get_vector("camera_left", "camera_right", "camera_up", "camera_down")
 	if look != Vector2.ZERO:
 		var y_sign := -1.0 if invert_y else 1.0
 		yaw -= deg_to_rad(look.x * gamepad_sensitivity * delta)
 		pitch -= deg_to_rad(look.y * gamepad_sensitivity * delta) * y_sign
 
 	# D-pad zoom: smooth and continuous while held.
-	var zoom_hold := Input.get_axis("zoom_in_hold", "zoom_out_hold")
+	var zoom_hold := Input.get_axis("zoom_in_hold", "zoom_out_hold") if input_enabled else 0.0
 	if zoom_hold != 0.0:
 		_target_distance = clampf(_target_distance + zoom_hold * gamepad_zoom_speed * delta,
 				min_distance, max_distance)

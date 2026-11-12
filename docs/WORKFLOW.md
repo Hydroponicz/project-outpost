@@ -23,3 +23,15 @@ Two branches. That's it.
 
 ## Notes
 - Branches named `claude/...` are Claude's scratch space for each chat session. You can ignore them.
+
+## Godot-generated files
+Godot creates some files itself when it opens the project: a `.uid` file next to
+every script, and `.import` files next to images. **Commit these** (they belong in
+the repo); Claude can't create them because Godot doesn't run in its sandbox.
+
+If GitHub Desktop refuses to pull because `project.godot` "would be overwritten":
+1. Right-click `project.godot` in Changes → **Discard changes** (Godot just re-saved it).
+2. **Pull origin**.
+3. Open the project in Godot, then commit any new generated files to `preview` and push.
+
+Claude always fetches `preview` before making changes, so your commits there are safe.

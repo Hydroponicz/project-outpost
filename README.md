@@ -14,6 +14,9 @@ Open `project.godot` in Godot and press F5 (Run Project). See `docs/ROADMAP.md` 
 | Zoom | Scroll wheel | Hold d-pad up / down |
 | Hit (hold to keep swinging) | Left mouse | RT / R2 |
 | Interact | E | X / Square |
+| Inventory | Tab | View / Select (Share on PlayStation) |
+| Move items (in inventory) | Drag with mouse | Highlight, A to grab, A to drop, B to cancel |
+| Drop stack (in inventory) | Q, or drag it outside the panel | Y / Triangle |
 | Free / grab mouse | Esc (click to grab again) | Start |
 
 Plan: `docs/ROADMAP.md` · How updates are tested and merged: `docs/WORKFLOW.md`

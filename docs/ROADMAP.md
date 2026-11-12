@@ -18,8 +18,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 1. [x] Player controller: movement, camera, jump, sprint
 2. [x] Interaction: look at a thing, press a key
 3. [x] Resources and gathering
-4. [ ] Inventory  ← next
-5. [ ] Crafting (by hand, then at stations)
+4. [x] Inventory
+5. [ ] Crafting (by hand, then at stations)  ← next
 6. [ ] Building
 7. [ ] Survival pressure (health, hunger, stamina)
 8. [ ] Workers v1: one worker gathers into a chest
@@ -28,7 +28,6 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 
 ## Later, maybe (not now)
 - Replanting trees from saplings/seeds (trees never regrow on their own; also a worker job)
-- Weight limit on carried items (with inventory or survival)
 - Combat, enemies, bosses
 - Biomes
 - Multiplayer
