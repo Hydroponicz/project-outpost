@@ -1,0 +1,10 @@
+# Godot 4 cache and imported asset data
+.godot/
+/android/
+
+# Export builds
+/builds/
+
+# OS junk
+.DS_Store
+Thumbs.db
