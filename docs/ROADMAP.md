@@ -17,8 +17,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 ## Systems (built in order, each one finished before the next)
 1. [x] Player controller: movement, camera, jump, sprint
 2. [x] Interaction: look at a thing, press a key
-3. [ ] Resources and gathering  ← current
-4. [ ] Inventory
+3. [x] Resources and gathering
+4. [ ] Inventory  ← next
 5. [ ] Crafting (by hand, then at stations)
 6. [ ] Building
 7. [ ] Survival pressure (health, hunger, stamina)
