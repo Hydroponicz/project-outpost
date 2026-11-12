@@ -97,6 +97,16 @@ func move_stack(from: int, to: int) -> void:
 	changed.emit()
 
 
+## Removes and returns the whole stack in a slot (null if it was empty).
+func take_slot(index: int) -> ItemStack:
+	_ensure_slots()
+	var stack := _slots[index]
+	if stack != null:
+		_slots[index] = null
+		changed.emit()
+	return stack
+
+
 func get_total_weight() -> float:
 	_ensure_slots()
 	var total := 0.0

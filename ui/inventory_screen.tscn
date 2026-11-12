@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://ui/inventory_screen.gd" id="1_screen"]
+[ext_resource type="Script" path="res://ui/drop_zone.gd" id="2_drop_zone"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.06, 0.06, 0.08, 0.92)
@@ -26,6 +27,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.45)
+script = ExtResource("2_drop_zone")
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 3

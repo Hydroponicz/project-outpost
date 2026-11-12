@@ -10,6 +10,10 @@ extends CanvasLayer
 ##            (or Enter) to grab a stack; it rides along with the highlight.
 ##            Press A again to drop it, B to put it back.
 ##
+## Dropping on the ground (whole stack):
+##   Mouse:   drag a stack outside the panel and release.
+##   Button:  Q / Y drops the highlighted stack (or the one being held).
+##
 ## The screen tracks the highlighted slot itself ("_cursor") and reads its
 ## own menu_* input actions, so it doesn't depend on Godot's built-in UI
 ## focus navigation.
@@ -28,6 +32,7 @@ var _held_from: int = -1
 @onready var _grid: GridContainer = $Center/Panel/Margin/VBox/Grid
 @onready var _weight_label: Label = $Center/Panel/Margin/VBox/Weight
 @onready var _held_label: Label = $HeldLabel
+@onready var _drop_zone: InventoryDropZone = $Dim
 
 
 func _ready() -> void:
@@ -40,6 +45,7 @@ func _ready() -> void:
 		slot.dropped.connect(_on_slot_dropped)
 		_grid.add_child(slot)
 		_slots.append(slot)
+	_drop_zone.stack_dropped.connect(_drop_to_ground)
 	inventory.changed.connect(_refresh)
 	_refresh()
 
@@ -66,6 +72,8 @@ func _input(event: InputEvent) -> void:
 			close()
 	elif event.is_action_pressed("menu_accept"):
 		_grab_or_drop(_cursor)
+	elif event.is_action_pressed("drop_item"):
+		_drop_to_ground(_held_from if _held_from != -1 else _cursor)
 	elif event.is_action_pressed("menu_left"):
 		_move_cursor(-1, 0)
 	elif event.is_action_pressed("menu_right"):
@@ -118,6 +126,15 @@ func _grab_or_drop(index: int) -> void:
 		_held_from = -1  # Drop.
 		inventory.move_stack(from, index)
 		_refresh()
+
+
+## Takes the whole stack out of a slot and drops it in front of the player.
+func _drop_to_ground(index: int) -> void:
+	_held_from = -1
+	var stack := inventory.take_slot(index)
+	if stack != null:
+		player.drop_items(stack.item, stack.amount)
+	_refresh()
 
 
 func _on_slot_hovered(index: int) -> void:

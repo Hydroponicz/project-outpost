@@ -13,12 +13,19 @@ extends RigidBody3D
 @export var attract_start_speed: float = 2.0
 ## Collected once it's this close to the player.
 @export var collect_distance: float = 0.3
+## Size multiplier for bundles (more than one item in a single pickup).
+@export var bundle_scale: float = 1.6
+
+## True for items the player dropped on purpose. They aren't auto-picked up
+## until the player has walked out of pickup range (ItemCollector clears it).
+var dropped_by_player: bool = false
 
 var _age: float = 0.0
 var _collector: ItemCollector = null
 var _attract_speed: float = 0.0
 var _normal_layer: int
 var _normal_mask: int
+var _base_scale: Vector3 = Vector3.ONE
 
 @onready var _mesh: MeshInstance3D = $Mesh
 
@@ -26,13 +33,23 @@ var _normal_mask: int
 func _ready() -> void:
 	_normal_layer = collision_layer
 	_normal_mask = collision_mask
+
+	# Bundles look (and collide) bigger. The shape is shared between all
+	# pickups, so make this one its own copy before resizing it.
+	if amount > 1:
+		var collision: CollisionShape3D = $CollisionShape3D
+		var box := collision.shape.duplicate() as BoxShape3D
+		box.size *= bundle_scale
+		collision.shape = box
+		_base_scale = Vector3.ONE * bundle_scale
+		_mesh.scale = _base_scale
 	var material := StandardMaterial3D.new()
 	material.albedo_color = item.drop_color if item else Color.WHITE
 	_mesh.material_override = material
 
 
 func can_be_collected() -> bool:
-	return _collector == null and _age >= pickup_delay
+	return _collector == null and _age >= pickup_delay and not dropped_by_player
 
 
 ## Called by the player's ItemCollector. Switches off physics and starts flying.
@@ -67,7 +84,7 @@ func _physics_process(delta: float) -> void:
 
 	global_position += to_target / distance * step
 	# Shrink as it gets close, for a satisfying "slurp".
-	_mesh.scale = Vector3.ONE * clampf(distance / 1.5, 0.3, 1.0)
+	_mesh.scale = _base_scale * clampf(distance / 1.5, 0.3, 1.0)
 
 
 ## Turns physics back on and lets the piece fall where it is.
@@ -78,4 +95,4 @@ func _drop_back() -> void:
 	collision_layer = _normal_layer
 	collision_mask = _normal_mask
 	linear_velocity = Vector3.ZERO
-	_mesh.scale = Vector3.ONE
+	_mesh.scale = _base_scale

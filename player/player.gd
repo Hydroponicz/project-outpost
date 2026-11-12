@@ -45,6 +45,7 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var _camera_rig: CameraRig = $CameraRig
 @onready var _interactor: Interactor = $Interactor
 @onready var _inventory: Inventory = $Inventory
+@onready var _collector: ItemCollector = $ItemCollector
 
 
 ## Turns player control (movement, camera, hitting, interacting) on or off.
@@ -55,6 +56,14 @@ func set_controls_enabled(enabled: bool) -> void:
 	_interactor.enabled = enabled
 	if not enabled:
 		_sprint_toggled = false
+
+
+## Drops items on the ground in front of the character, as one bundle.
+func drop_items(item: ItemData, amount: int) -> void:
+	var forward := -_visual.global_basis.z  # The way the character faces.
+	var at := global_position + forward * 0.8 + Vector3.UP * 1.2
+	var toss := forward * 2.5 + Vector3.UP * 2.0
+	_collector.drop(item, amount, at, toss)
 
 
 func _physics_process(delta: float) -> void:
