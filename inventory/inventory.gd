@@ -97,6 +97,37 @@ func move_stack(from: int, to: int) -> void:
 	changed.emit()
 
 
+## Total amount of an item across all slots.
+func count_item(item: ItemData) -> int:
+	_ensure_slots()
+	var total := 0
+	for stack in _slots:
+		if stack != null and stack.item == item:
+			total += stack.amount
+	return total
+
+
+## Removes up to "amount" of an item, taking from the last slots first.
+## Returns how many were actually removed.
+func remove_item(item: ItemData, amount: int) -> int:
+	_ensure_slots()
+	var remaining := amount
+	for i in range(_slots.size() - 1, -1, -1):
+		if remaining <= 0:
+			break
+		var stack := _slots[i]
+		if stack == null or stack.item != item:
+			continue
+		var taken := mini(remaining, stack.amount)
+		stack.amount -= taken
+		remaining -= taken
+		if stack.amount <= 0:
+			_slots[i] = null
+	if remaining != amount:
+		changed.emit()
+	return amount - remaining
+
+
 ## Removes and returns the whole stack in a slot (null if it was empty).
 func take_slot(index: int) -> ItemStack:
 	_ensure_slots()

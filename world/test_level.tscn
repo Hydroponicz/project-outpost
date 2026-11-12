@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://world/test_box.tscn" id="3_test_box"]
 [ext_resource type="PackedScene" path="res://world/resources/tree.tscn" id="4_tree"]
 [ext_resource type="PackedScene" path="res://world/resources/rock.tscn" id="5_rock"]
+[ext_resource type="PackedScene" path="res://world/stations/workbench.tscn" id="6_workbench"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 
@@ -186,3 +187,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 18)
 
 [node name="Rock_4" parent="Resources" instance=ExtResource("5_rock")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 11)
+
+[node name="Stations" type="Node3D" parent="."]
+
+[node name="Workbench" parent="Stations" instance=ExtResource("6_workbench")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)

@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://cg047kxancies" path="res://items/item_collector.gd" id="5_collector"]
 [ext_resource type="Script" uid="uid://bjcfafm0igvb0" path="res://inventory/inventory.gd" id="6_inventory"]
 [ext_resource type="PackedScene" path="res://ui/inventory_screen.tscn" id="7_inventory_screen"]
+[ext_resource type="Script" path="res://crafting/crafter.gd" id="8_crafter"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -93,6 +94,12 @@ interactor = NodePath("../Interactor")
 collector = NodePath("../ItemCollector")
 inventory = NodePath("../Inventory")
 
-[node name="InventoryScreen" parent="." unique_id=297101874 node_paths=PackedStringArray("player", "inventory") instance=ExtResource("7_inventory_screen")]
+[node name="Crafter" type="Node" parent="." node_paths=PackedStringArray("inventory", "body")]
+script = ExtResource("8_crafter")
+inventory = NodePath("../Inventory")
+body = NodePath("..")
+
+[node name="InventoryScreen" parent="." unique_id=297101874 node_paths=PackedStringArray("player", "inventory", "crafter") instance=ExtResource("7_inventory_screen")]
 player = NodePath("..")
 inventory = NodePath("../Inventory")
+crafter = NodePath("../Crafter")
