@@ -17,7 +17,7 @@ extends Node3D
 ## Mouse look speed, in degrees per pixel moved.
 @export var mouse_sensitivity: float = 0.2
 ## Right stick look speed, in degrees per second at full tilt.
-@export var gamepad_sensitivity: float = 180.0
+@export var gamepad_sensitivity: float = 260.0
 @export var invert_y: bool = false
 ## How far down the camera can tilt (negative = looking down from above).
 @export_range(-89.0, 0.0) var min_pitch_degrees: float = -70.0
@@ -28,8 +28,10 @@ extends Node3D
 @export var min_distance: float = 1.5
 @export var max_distance: float = 8.0
 @export var start_distance: float = 4.5
-## Distance change per scroll-wheel click or d-pad press.
+## Distance change per scroll-wheel click.
 @export var zoom_step: float = 0.5
+## Zoom speed while holding the d-pad, in meters per second.
+@export var gamepad_zoom_speed: float = 6.0
 ## How smoothly zoom eases to its new distance. Higher = faster.
 @export var zoom_smoothing: float = 10.0
 
@@ -81,7 +83,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		yaw -= deg_to_rad(event.relative.x * mouse_sensitivity)
 		pitch -= deg_to_rad(event.relative.y * mouse_sensitivity) * y_sign
 
-	# Zoom.
+	# Zoom (mouse wheel, one step per click).
 	if event.is_action_pressed("zoom_in"):
 		_target_distance -= zoom_step
 	elif event.is_action_pressed("zoom_out"):
@@ -96,6 +98,12 @@ func _process(delta: float) -> void:
 		var y_sign := -1.0 if invert_y else 1.0
 		yaw -= deg_to_rad(look.x * gamepad_sensitivity * delta)
 		pitch -= deg_to_rad(look.y * gamepad_sensitivity * delta) * y_sign
+
+	# D-pad zoom: smooth and continuous while held.
+	var zoom_hold := Input.get_axis("zoom_in_hold", "zoom_out_hold")
+	if zoom_hold != 0.0:
+		_target_distance = clampf(_target_distance + zoom_hold * gamepad_zoom_speed * delta,
+				min_distance, max_distance)
 
 	pitch = clampf(pitch, deg_to_rad(min_pitch_degrees), deg_to_rad(max_pitch_degrees))
 

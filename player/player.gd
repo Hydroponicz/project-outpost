@@ -29,6 +29,10 @@ extends CharacterBody3D
 ## 1 = same as rising. Higher = snappier landings.
 @export var fall_gravity_multiplier: float = 1.6
 
+## Gamepad sprint is a toggle: click the left stick to start, and it stops
+## when you let go of the stick (or click again).
+var _sprint_toggled: bool = false
+
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 @onready var _visual: Node3D = $Visual
@@ -58,8 +62,16 @@ func _physics_process(delta: float) -> void:
 	var camera_yaw := Basis(Vector3.UP, _camera_rig.yaw)
 	var move_dir := camera_yaw * Vector3(input.x, 0.0, input.y)
 
+	# --- Sprint ---
+	# Keyboard: hold Shift. Gamepad: click the stick to toggle.
+	if Input.is_action_just_pressed("sprint_toggle"):
+		_sprint_toggled = not _sprint_toggled
+	if input.length() < 0.1:
+		_sprint_toggled = false  # Stopped moving, so stop sprinting.
+	var sprinting := Input.is_action_pressed("sprint") or _sprint_toggled
+
 	# --- Horizontal movement ---
-	var speed := sprint_speed if Input.is_action_pressed("sprint") else walk_speed
+	var speed := sprint_speed if sprinting else walk_speed
 	var target_velocity := move_dir * speed
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 

@@ -49,7 +49,11 @@ move_right={
 sprint={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194325,"script":null)
-, Object(InputEventJoypadButton,"device":-1,"button_index":7,"pressed":false,"script":null)
+]
+}
+sprint_toggle={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":7,"pressed":false,"script":null)
 ]
 }
 jump={
@@ -81,13 +85,21 @@ camera_down={
 zoom_in={
 "deadzone": 0.5,
 "events": [Object(InputEventMouseButton,"device":-1,"button_index":4,"pressed":true,"script":null)
-, Object(InputEventJoypadButton,"device":-1,"button_index":11,"pressed":false,"script":null)
 ]
 }
 zoom_out={
 "deadzone": 0.5,
 "events": [Object(InputEventMouseButton,"device":-1,"button_index":5,"pressed":true,"script":null)
-, Object(InputEventJoypadButton,"device":-1,"button_index":12,"pressed":false,"script":null)
+]
+}
+zoom_in_hold={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":11,"pressed":false,"script":null)
+]
+}
+zoom_out_hold={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":12,"pressed":false,"script":null)
 ]
 }
 toggle_mouse_capture={
