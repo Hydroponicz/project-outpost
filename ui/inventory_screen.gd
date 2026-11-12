@@ -6,8 +6,13 @@ extends CanvasLayer
 ##
 ## Moving stacks:
 ##   Mouse:   press on a stack, drag, release on another slot.
-##   Gamepad: highlight a stack, press A to grab it (it rides along with the
-##            highlight), move, press A to drop. B cancels.
+##   Gamepad: move the highlight (d-pad / left stick / arrow keys), press A
+##            (or Enter) to grab a stack; it rides along with the highlight.
+##            Press A again to drop it, B to put it back.
+##
+## The screen tracks the highlighted slot itself ("_cursor") and reads its
+## own menu_* input actions, so it doesn't depend on Godot's built-in UI
+## focus navigation.
 
 @export var player: Player
 @export var inventory: Inventory
@@ -15,6 +20,8 @@ extends CanvasLayer
 var is_open: bool = false
 
 var _slots: Array[InventorySlot] = []
+## Index of the highlighted slot.
+var _cursor: int = 0
 ## Slot index of the stack grabbed with A/Enter, or -1 when not holding one.
 var _held_from: int = -1
 
@@ -29,7 +36,7 @@ func _ready() -> void:
 		var slot := InventorySlot.new()
 		slot.index = i
 		slot.inventory = inventory
-		slot.accepted.connect(_on_slot_accepted)
+		slot.hovered.connect(_on_slot_hovered)
 		slot.dropped.connect(_on_slot_dropped)
 		_grid.add_child(slot)
 		_slots.append(slot)
@@ -50,22 +57,28 @@ func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
 
-	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("toggle_mouse_capture"):
+	var handled := true
+	if event.is_action_pressed("menu_cancel") or event.is_action_pressed("toggle_mouse_capture"):
 		if _held_from != -1:
 			_held_from = -1  # First press just puts the held stack back.
 			_refresh()
 		else:
 			close()
+	elif event.is_action_pressed("menu_accept"):
+		_grab_or_drop(_cursor)
+	elif event.is_action_pressed("menu_left"):
+		_move_cursor(-1, 0)
+	elif event.is_action_pressed("menu_right"):
+		_move_cursor(1, 0)
+	elif event.is_action_pressed("menu_up"):
+		_move_cursor(0, -1)
+	elif event.is_action_pressed("menu_down"):
+		_move_cursor(0, 1)
+	else:
+		handled = false
+
+	if handled:
 		get_viewport().set_input_as_handled()
-
-
-func _process(_delta: float) -> void:
-	if not is_open or _held_from == -1:
-		return
-	# The held stack floats just above whichever slot is highlighted.
-	var focused := get_viewport().gui_get_focus_owner() as Control
-	if focused != null:
-		_held_label.position = focused.global_position + Vector2(0, -_held_label.size.y)
 
 
 func open() -> void:
@@ -75,19 +88,27 @@ func open() -> void:
 	player.set_controls_enabled(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_refresh()
-	_slots[0].grab_focus.call_deferred()  # Gamepad users start on the first slot.
 
 
 func close() -> void:
 	is_open = false
 	visible = false
 	_held_from = -1
-	get_viewport().gui_release_focus()
 	player.set_controls_enabled(true)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
-func _on_slot_accepted(index: int) -> void:
+## Moves the highlight by whole columns/rows, stopping at the grid edges.
+func _move_cursor(dx: int, dy: int) -> void:
+	var columns := _grid.columns
+	var rows := ceili(float(_slots.size()) / columns)
+	var col := clampi(_cursor % columns + dx, 0, columns - 1)
+	var row := clampi(floori(float(_cursor) / columns) + dy, 0, rows - 1)
+	_cursor = mini(row * columns + col, _slots.size() - 1)
+	_refresh()
+
+
+func _grab_or_drop(index: int) -> void:
 	if _held_from == -1:
 		if inventory.get_slot(index) != null:
 			_held_from = index  # Grab.
@@ -99,8 +120,14 @@ func _on_slot_accepted(index: int) -> void:
 		_refresh()
 
 
+func _on_slot_hovered(index: int) -> void:
+	_cursor = index
+	_refresh()
+
+
 func _on_slot_dropped(from_index: int, to_index: int) -> void:
 	_held_from = -1
+	_cursor = to_index
 	inventory.move_stack(from_index, to_index)
 	_refresh()
 
@@ -112,6 +139,7 @@ func _refresh() -> void:
 
 	for i in _slots.size():
 		_slots[i].show_stack(inventory.get_slot(i), i == _held_from)
+		_slots[i].set_highlighted(i == _cursor)
 
 	var weight := inventory.get_total_weight()
 	_weight_label.text = "Weight  %d / %d" % [roundi(weight), roundi(inventory.max_weight)]
@@ -121,3 +149,11 @@ func _refresh() -> void:
 	if _held_from != -1:
 		_held_label.text = InventorySlot.get_stack_text(inventory.get_slot(_held_from)).replace("\n", " ×")
 		_held_label.reset_size()
+		_update_held_label_position.call_deferred()
+
+
+## Floats the held stack's name just above the highlighted slot.
+## Deferred so the grid has finished laying out the first time it opens.
+func _update_held_label_position() -> void:
+	var slot := _slots[_cursor]
+	_held_label.position = slot.global_position + Vector2(0, -_held_label.size.y)
