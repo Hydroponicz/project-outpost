@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://player/camera_rig.gd" id="2_camera"]
+[ext_resource type="Script" path="res://interaction/interactor.gd" id="3_interactor"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="4_hud"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -60,3 +62,11 @@ margin = 0.1
 [node name="Camera3D" type="Camera3D" parent="CameraRig/PitchPivot/SpringArm3D"]
 current = true
 fov = 70.0
+
+[node name="Interactor" type="Node" parent="." node_paths=PackedStringArray("camera", "body")]
+script = ExtResource("3_interactor")
+camera = NodePath("../CameraRig/PitchPivot/SpringArm3D/Camera3D")
+body = NodePath("..")
+
+[node name="HUD" parent="." node_paths=PackedStringArray("interactor") instance=ExtResource("4_hud")]
+interactor = NodePath("../Interactor")

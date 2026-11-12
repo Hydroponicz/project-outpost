@@ -12,6 +12,7 @@ Open `project.godot` in Godot and press F5 (Run Project). See `docs/ROADMAP.md` 
 | Sprint | Hold Shift | Click left stick (stops when you let go of the stick) |
 | Jump | Space | A / Cross |
 | Zoom | Scroll wheel | Hold d-pad up / down |
+| Interact | E | X / Square |
 | Free / grab mouse | Esc (click to grab again) | Start |
 
 Plan: `docs/ROADMAP.md` · How updates are tested and merged: `docs/WORKFLOW.md`
