@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://world/resources/tree.tscn" id="4_tree"]
 [ext_resource type="PackedScene" path="res://world/resources/rock.tscn" id="5_rock"]
 [ext_resource type="PackedScene" path="res://world/stations/workbench.tscn" id="6_workbench"]
+[ext_resource type="PackedScene" path="res://world/resources/branch.tscn" id="7_branch"]
+[ext_resource type="PackedScene" path="res://world/resources/loose_stone.tscn" id="8_loose_stone"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 
@@ -192,3 +194,47 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 11)
 
 [node name="Workbench" parent="Stations" instance=ExtResource("6_workbench")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="Forage" type="Node3D" parent="."]
+
+[node name="Branch_1" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(0.9397, 0, -0.342, 0, 1, 0, 0.342, 0, 0.9397, 2, 0, 8)
+
+[node name="Branch_2" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(-0.342, 0, -0.9397, 0, 1, 0, 0.9397, 0, -0.342, -2, 0, 9)
+
+[node name="Branch_3" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(0.5, 0, -0.866, 0, 1, 0, 0.866, 0, 0.5, 5, 0, 7)
+
+[node name="Branch_4" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(-0.866, 0, -0.5, 0, 1, 0, 0.5, 0, -0.866, -6, 0, 6)
+
+[node name="Branch_5" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(0.8192, 0, -0.5736, 0, 1, 0, 0.5736, 0, 0.8192, 1, 0, 12)
+
+[node name="Branch_6" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(-0.08716, 0, -0.9962, 0, 1, 0, 0.9962, 0, -0.08716, 6, 0, 10)
+
+[node name="Branch_7" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(-0.9848, 0, -0.1736, 0, 1, 0, 0.1736, 0, -0.9848, -3, 0, 12)
+
+[node name="Branch_8" parent="Forage" instance=ExtResource("7_branch")]
+transform = Transform3D(-0.6428, 0, -0.766, 0, 1, 0, 0.766, 0, -0.6428, 1, 0, 1)
+
+[node name="LooseStone_1" parent="Forage" instance=ExtResource("8_loose_stone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
+
+[node name="LooseStone_2" parent="Forage" instance=ExtResource("8_loose_stone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 9)
+
+[node name="LooseStone_3" parent="Forage" instance=ExtResource("8_loose_stone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 6)
+
+[node name="LooseStone_4" parent="Forage" instance=ExtResource("8_loose_stone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 5)
+
+[node name="LooseStone_5" parent="Forage" instance=ExtResource("8_loose_stone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14)
+
+[node name="LooseStone_6" parent="Forage" instance=ExtResource("8_loose_stone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 9)

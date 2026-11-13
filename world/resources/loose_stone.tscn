@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/resources/forage_pickup.gd" id="1_forage"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="Resource" path="res://items/stone.tres" id="3_item"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_target"]
+size = Vector3(0.5, 0.3, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_forage"]
+albedo_color = Color(0.55, 0.55, 0.57, 1)
+
+[sub_resource type="SphereMesh" id="Mesh_forage"]
+material = SubResource("StandardMaterial3D_forage")
+radius = 0.14
+height = 0.2
+
+[node name="LooseStone" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_forage")
+item = ExtResource("3_item")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("BoxShape3D_target")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Mesh" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("Mesh_forage")
+
+[node name="Interactable" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+script = ExtResource("2_interactable")
+object_name = "Loose Stone"
+action_text = "Pick up"

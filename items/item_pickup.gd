@@ -5,6 +5,9 @@ extends RigidBody3D
 
 @export var item: ItemData
 @export var amount: int = 1
+## For tools: uses left (-1 = brand new / not a tool). Kept when a worn
+## tool is dropped and picked back up.
+@export var durability: int = -1
 ## Seconds after spawning before it can be picked up.
 @export var pickup_delay: float = 1.5
 ## How fast the vacuum speeds up, in meters per second, per second.

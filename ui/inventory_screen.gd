@@ -15,6 +15,8 @@ extends CanvasLayer
 ##   Mouse:   drag a stack outside the panel and release.
 ##   Button:  Q / Y drops the highlighted stack (or the one being held).
 ##
+## Hotbar: the top row of slots (numbered 1-8) is the hotbar.
+##
 ## Crafting:
 ##   Mouse:   click a recipe.
 ##   Gamepad: move right past the grid's last column into the recipe list,
@@ -25,6 +27,9 @@ extends CanvasLayer
 
 enum Area { GRID, RECIPES }
 
+## Stands in for the "Repair tools" row in the crafting list.
+const REPAIR_ENTRY := &"repair"
+
 @export var player: Player
 @export var inventory: Inventory
 @export var crafter: Crafter
@@ -33,8 +38,9 @@ var is_open: bool = false
 
 var _slots: Array[InventorySlot] = []
 var _recipe_rows: Array[RecipeRow] = []
-## Recipes shown right now (same order as _recipe_rows).
-var _recipes: Array[RecipeData] = []
+## Crafting list entries shown right now (same order as _recipe_rows):
+## RecipeData, or REPAIR_ENTRY for the repair row.
+var _recipes: Array = []
 
 ## Which part of the screen the highlight is in.
 var _area: Area = Area.GRID
@@ -58,6 +64,8 @@ func _ready() -> void:
 		var slot := InventorySlot.new()
 		slot.index = i
 		slot.inventory = inventory
+		if i < Hotbar.SIZE:
+			slot.hotkey = i + 1  # Top row = hotbar.
 		slot.hovered.connect(_on_slot_hovered)
 		slot.dropped.connect(_on_slot_dropped)
 		_grid.add_child(slot)
@@ -171,14 +179,26 @@ func _drop_to_ground(index: int) -> void:
 	_held_from = -1
 	var stack := inventory.take_slot(index)
 	if stack != null:
-		player.drop_items(stack.item, stack.amount)
+		player.drop_items(stack.item, stack.amount, stack.durability)
 	_refresh()
 
 
 func _craft(recipe_index: int) -> void:
 	if recipe_index < 0 or recipe_index >= _recipes.size():
 		return
-	var recipe := _recipes[recipe_index]
+	var entry: Variant = _recipes[recipe_index]
+	if entry is StringName and entry == REPAIR_ENTRY:
+		var repaired := crafter.repair_all()
+		if repaired == 0:
+			_craft_info.text = "Nothing to repair"
+		elif repaired == 1:
+			_craft_info.text = "Repaired 1 tool"
+		else:
+			_craft_info.text = "Repaired %d tools" % repaired
+		_refresh()
+		return
+
+	var recipe: RecipeData = entry
 	if crafter.craft(recipe):
 		_craft_info.text = "Crafted %s" % recipe.get_display_name()
 	elif not crafter.has_ingredients(recipe):
@@ -235,7 +255,10 @@ func _refresh() -> void:
 
 
 func _refresh_recipes() -> void:
-	var available := crafter.get_available_recipes()
+	var available: Array = []
+	if crafter.can_repair_here():
+		available.append(REPAIR_ENTRY)
+	available.append_array(crafter.get_available_recipes())
 	# Only rebuild the rows when the list itself changed (e.g. near a new station).
 	if available != _recipes:
 		_recipes = available
@@ -258,8 +281,14 @@ func _refresh_recipes() -> void:
 		_recipe_cursor = clampi(_recipe_cursor, 0, _recipes.size() - 1)
 
 	for i in _recipe_rows.size():
-		_recipe_rows[i].show_recipe(_recipes[i], inventory, crafter.can_craft(_recipes[i]),
-				_area == Area.RECIPES and i == _recipe_cursor)
+		var highlighted := _area == Area.RECIPES and i == _recipe_cursor
+		var entry: Variant = _recipes[i]
+		if entry is StringName and entry == REPAIR_ENTRY:
+			_recipe_rows[i].show_entry("Repair tools", "Free at the workbench",
+					inventory.has_damaged_items(), highlighted)
+		else:
+			var recipe: RecipeData = entry
+			_recipe_rows[i].show_recipe(recipe, inventory, crafter.can_craft(recipe), highlighted)
 
 
 ## Floats the held stack's name just above the highlighted slot.

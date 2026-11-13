@@ -11,6 +11,9 @@ signal hit(by: Node, damage: int)
 @export var object_name: String = "Object"
 ## Verb shown in the prompt, e.g. "Chop", "Mine".
 @export var action_text: String = "Hit"
+## Tool type needed to hit this, e.g. "axe". Empty = anything works, even hands.
+## Must match an item's "tool_type".
+@export var required_tool: StringName = &""
 
 
 func get_prompt_text() -> String:
