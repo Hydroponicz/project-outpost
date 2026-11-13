@@ -35,5 +35,5 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 - Combat, enemies, bosses
 - Biomes
 - Multiplayer
-- Animations, crouch, swim, climb, step-up on stairs
+- Animations (incl. tool swings; held tool is a static placeholder), crouch, swim, climb, step-up on stairs
 - Settings menu (sensitivity, key rebinding)
