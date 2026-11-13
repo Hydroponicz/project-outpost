@@ -9,6 +9,10 @@ signal device_changed(using_gamepad: bool)
 var using_gamepad: bool = false
 
 
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS  # Keep tracking while paused.
+
+
 func _input(event: InputEvent) -> void:
 	var gamepad := using_gamepad
 	if event is InputEventKey or event is InputEventMouseButton:

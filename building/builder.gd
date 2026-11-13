@@ -15,7 +15,6 @@ extends Node
 ## Emitted when the on-screen build hint text changes ("" = hide it).
 signal hint_changed(text: String)
 
-const PIECE_FOLDER := "res://building/pieces/"
 ## Rotation step, like Valheim.
 const ROTATION_STEP := 0.39269908  # 22.5 degrees, in radians.
 
@@ -41,7 +40,7 @@ var enabled: bool = true:
 		if value and not enabled:
 			_place_blocked = true
 		enabled = value
-## Every piece found in PIECE_FOLDER, in menu order.
+## Every build piece (from GameDatabase), in menu order.
 var pieces: Array[BuildPieceData] = []
 ## The piece chosen in the build menu, or null.
 var selected: BuildPieceData = null
@@ -346,16 +345,9 @@ func _rebuild_ghost() -> void:
 
 
 func _load_pieces() -> void:
-	for file in DirAccess.get_files_at(PIECE_FOLDER):
-		# Exported games rename files to "name.tres.remap"; load the original name.
-		var file_name := file.trim_suffix(".remap")
-		if not file_name.ends_with(".tres"):
-			continue
-		var piece := load(PIECE_FOLDER + file_name) as BuildPieceData
-		if piece != null and piece.scene != null:
-			pieces.append(piece)
-			_templates[piece] = _make_template(piece)
-	pieces.sort_custom(func(a: BuildPieceData, b: BuildPieceData) -> bool: return a.sort_order < b.sort_order)
+	pieces = GameDatabase.get_pieces()
+	for piece in pieces:
+		_templates[piece] = _make_template(piece)
 
 
 ## Opens the piece's scene (without adding it to the world) and copies out

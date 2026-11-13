@@ -74,6 +74,30 @@ func get_inventory() -> Inventory:
 	return _inventory
 
 
+## Everything about the player that goes in the save file.
+func get_save_data() -> Dictionary:
+	return {
+		"position": [global_position.x, global_position.y, global_position.z],
+		"facing": _visual.rotation.y,
+		"camera_yaw": _camera_rig.yaw,
+		"camera_pitch": _camera_rig.pitch,
+		"hotbar": _hotbar.selected,
+		"inventory": _inventory.get_save_data(),
+	}
+
+
+func apply_save_data(data: Dictionary) -> void:
+	var pos: Array = data.get("position", [0, 0, 0])
+	global_position = Vector3(pos[0], pos[1], pos[2])
+	velocity = Vector3.ZERO
+	reset_physics_interpolation()  # Teleport, don't slide from the old spot.
+	_visual.rotation.y = data.get("facing", 0.0)
+	_camera_rig.yaw = data.get("camera_yaw", 0.0)
+	_camera_rig.pitch = data.get("camera_pitch", _camera_rig.pitch)
+	_hotbar.select(int(data.get("hotbar", 0)))
+	_inventory.apply_save_data(data.get("inventory", []))
+
+
 ## Opens the inventory screen next to a chest (or other container).
 func open_container(container: Inventory, title: String) -> void:
 	_inventory_screen.open_container(container, title)

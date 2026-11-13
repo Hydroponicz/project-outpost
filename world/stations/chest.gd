@@ -16,6 +16,15 @@ func get_inventory() -> Inventory:
 	return _inventory
 
 
+## Extra data for the save file (BuildPiece pieces may have this).
+func get_save_data() -> Dictionary:
+	return {"inventory": _inventory.get_save_data()}
+
+
+func apply_save_data(data: Dictionary) -> void:
+	_inventory.apply_save_data(data.get("inventory", []))
+
+
 ## Asked by the hammer before removing this piece.
 func can_be_removed() -> bool:
 	return _inventory.is_empty()

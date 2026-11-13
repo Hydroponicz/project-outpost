@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://world/world.gd" id="9_world"]
 [ext_resource type="Texture2D" path="res://assets/textures/grid_checker.png" id="2_grid"]
 [ext_resource type="PackedScene" path="res://world/test_box.tscn" id="3_test_box"]
 [ext_resource type="PackedScene" path="res://world/resources/tree.tscn" id="4_tree"]
@@ -55,6 +56,7 @@ uv1_triplanar = true
 uv1_world_triplanar = true
 
 [node name="TestLevel" type="Node3D"]
+script = ExtResource("9_world")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_main")

@@ -26,8 +26,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 4. [x] Inventory
 5. [x] Crafting: recipes by hand and at stations (test workbench placed in the level)
 6. [x] Tools: hotbar, axe/pickaxe required for trees/rocks, durability with free repair, forage
-7. [ ] Building: hammer, snap-point placement, workbench/floor/wall, then a chest  ← current
-8. [ ] Saving and loading
+7. [ ] Building: hammer, snap-point placement, workbench/floor/wall, then a chest  (tested, waiting to merge)
+8. [ ] Saving and loading: title screen, pause menu, autosave every 5 min and on quit  ← current
 9. [ ] Survival pressure (health, hunger, stamina)
 10. [ ] Workers v1: one worker gathers into a chest
 11. [ ] Production chains: workers run timed processing stations

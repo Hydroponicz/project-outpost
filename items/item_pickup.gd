@@ -33,7 +33,12 @@ var _base_scale: Vector3 = Vector3.ONE
 @onready var _mesh: MeshInstance3D = $Mesh
 
 
+## Every item lying in the world is in this group, so saving can find them.
+const GROUP := &"item_pickups"
+
+
 func _ready() -> void:
+	add_to_group(GROUP)
 	_normal_layer = collision_layer
 	_normal_mask = collision_mask
 

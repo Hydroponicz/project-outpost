@@ -8,6 +8,13 @@ extends Node
 ## Must match a BuildPieceData id (used to look up the refund when removed).
 @export var piece_id: StringName = &""
 
+## Every built piece is in this group, so saving can find them.
+const GROUP := &"build_pieces"
+
+
+func _ready() -> void:
+	add_to_group(GROUP)
+
 
 ## World positions of this piece's snap points.
 func get_snap_points() -> Array[Vector3]:

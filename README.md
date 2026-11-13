@@ -20,6 +20,6 @@ Open `project.godot` in Godot and press F5 (Run Project). See `docs/ROADMAP.md` 
 | Pick hotbar slot | 1-8 | LB / RB |
 | Build menu (hammer selected) | Right mouse | Y / Triangle |
 | Place / rotate / remove piece | Left mouse / Scroll / Middle mouse | RT / D-pad left-right / B |
-| Free / grab mouse | Esc (click to grab again) | Start |
+| Pause menu (resume, save, quit) | Esc | Start |
 
 Plan: `docs/ROADMAP.md` · How updates are tested and merged: `docs/WORKFLOW.md`

@@ -4,6 +4,8 @@ extends StaticBody3D
 ## Trees and rocks don't come back on their own (replanting comes later).
 
 const PICKUP_SCENE := preload("res://items/item_pickup.tscn")
+## Every resource node is in this group, so saving can find them.
+const GROUP := &"resource_nodes"
 
 ## What it drops.
 @export var item: ItemData
@@ -22,8 +24,18 @@ var _shake_tween: Tween
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	_health = max_health
 	_hittable.hit.connect(_on_hit)
+
+
+func get_health() -> int:
+	return _health
+
+
+## Used when loading a save (a half-chopped tree stays half-chopped).
+func set_health(value: int) -> void:
+	_health = clampi(value, 1, max_health)
 
 
 func _on_hit(_by: Node, damage: int) -> void:

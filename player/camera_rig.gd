@@ -74,11 +74,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not input_enabled:
 		return
 
-	# Esc / Start frees the mouse. Clicking the game window grabs it again.
-	if event.is_action_pressed("toggle_mouse_capture"):
-		_set_mouse_captured(Input.mouse_mode != Input.MOUSE_MODE_CAPTURED)
-		return
-
+	# Esc / Start opens the pause menu (ui/pause_menu.gd), which frees the
+	# mouse. If the mouse got freed some other way (e.g. alt-tab), clicking
+	# the game window grabs it again.
 	if event is InputEventMouseButton and event.pressed \
 			and event.button_index == MOUSE_BUTTON_LEFT \
 			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:

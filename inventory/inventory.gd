@@ -224,6 +224,35 @@ func is_overweight() -> bool:
 	return max_weight > 0.0 and get_total_weight() > max_weight
 
 
+# --- Saving ---
+
+## Slots as plain data for the save file: null, or {item, amount, durability}.
+func get_save_data() -> Array:
+	_ensure_slots()
+	var data: Array = []
+	for stack in _slots:
+		if stack == null:
+			data.append(null)
+		else:
+			data.append({"item": String(stack.item.id), "amount": stack.amount,
+					"durability": stack.durability})
+	return data
+
+
+func apply_save_data(data: Array) -> void:
+	_ensure_slots()
+	for i in _slots.size():
+		_slots[i] = null
+		if i >= data.size() or not data[i] is Dictionary:
+			continue
+		var entry: Dictionary = data[i]
+		var item := GameDatabase.get_item(StringName(entry.get("item", "")))
+		if item == null:
+			continue  # An item that no longer exists in the game.
+		_slots[i] = ItemStack.new(item, int(entry.get("amount", 1)), int(entry.get("durability", -1)))
+	changed.emit()
+
+
 ## Makes sure the slot list matches slot_count (safe to call any time).
 func _ensure_slots() -> void:
 	if _slots.size() != slot_count:

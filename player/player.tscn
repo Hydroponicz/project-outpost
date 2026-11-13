@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://player/held_item_view.gd" id="10_held_item"]
 [ext_resource type="Script" path="res://building/builder.gd" id="11_builder"]
 [ext_resource type="PackedScene" path="res://ui/build_menu.tscn" id="12_build_menu"]
+[ext_resource type="PackedScene" path="res://ui/pause_menu.tscn" id="13_pause_menu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -134,3 +135,6 @@ crafter = NodePath("../Crafter")
 player = NodePath("..")
 builder = NodePath("../Builder")
 inventory = NodePath("../Inventory")
+
+[node name="PauseMenu" parent="." node_paths=PackedStringArray("player") instance=ExtResource("13_pause_menu")]
+player = NodePath("..")

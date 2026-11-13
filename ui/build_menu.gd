@@ -60,7 +60,7 @@ func _input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if not is_open:
 		return
-	if Input.is_action_just_pressed("menu_cancel") or Input.is_action_just_pressed("toggle_mouse_capture"):
+	if Input.is_action_just_pressed("menu_cancel") or Input.is_action_just_pressed("pause"):
 		close()
 	elif Input.is_action_just_pressed("menu_accept"):
 		_choose(_cursor)
