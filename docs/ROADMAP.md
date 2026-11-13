@@ -20,8 +20,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 2. [x] Interaction: look at a thing, press a key
 3. [x] Resources and gathering
 4. [x] Inventory
-5. [ ] Crafting: recipes by hand and at stations (test workbench placed in the level)  ← current
-6. [ ] Tools: equipping and using crafted tools (axe, pickaxe)
+5. [x] Crafting: recipes by hand and at stations (test workbench placed in the level)
+6. [ ] Tools: equipping and using crafted tools (axe, pickaxe)  ← next
 7. [ ] Building (the workbench becomes buildable here)
 8. [ ] Survival pressure (health, hunger, stamina)
 9. [ ] Workers v1: one worker gathers into a chest
