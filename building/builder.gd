@@ -34,8 +34,13 @@ const ROTATION_STEP := 0.39269908  # 22.5 degrees, in radians.
 @export var ghost_color_ok: Color = Color(0.3, 1.0, 0.4, 0.4)
 @export var ghost_color_blocked: Color = Color(1.0, 0.3, 0.3, 0.4)
 
-## False while a menu is open.
-var enabled: bool = true
+## False while a menu is open. Turning it back on blocks placing until the
+## hit button is released (so the click that picked a piece doesn't place one).
+var enabled: bool = true:
+	set(value):
+		if value and not enabled:
+			_place_blocked = true
+		enabled = value
 ## Every piece found in PIECE_FOLDER, in menu order.
 var pieces: Array[BuildPieceData] = []
 ## The piece chosen in the build menu, or null.
@@ -49,6 +54,8 @@ var _placement := Transform3D()
 var _placement_ok: bool = false
 var _remove_target: BuildPiece = null
 var _hint: String = ""
+## See "enabled". Also set by a click that grabs the mouse back after Esc.
+var _place_blocked: bool = false
 
 
 ## What the builder needs to know about a piece without placing it:
@@ -106,11 +113,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif selected != null and event.is_action_pressed("build_rotate_right"):
 		_rotation_steps += 1
 		get_viewport().set_input_as_handled()
-	elif selected != null and event.is_action_pressed("hit"):
-		# A click that grabs the mouse back (after Esc) shouldn't place anything.
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or InputPrompts.using_gamepad:
-			_try_place()
-			get_viewport().set_input_as_handled()
+
+
+func _input(event: InputEvent) -> void:
+	# A click while the mouse is free just grabs it back; don't place with it.
+	if event is InputEventMouseButton and event.pressed \
+			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		_place_blocked = true
 
 
 func _physics_process(_delta: float) -> void:
@@ -121,6 +130,15 @@ func _physics_process(_delta: float) -> void:
 	_update_remove_target(hit)
 	_update_ghost(hit, active)
 	_update_hint(active)
+
+	# Placing is checked here as "just pressed" rather than from input events:
+	# the right trigger is analog and sends a stream of events while squeezed,
+	# which used to place several pieces at once.
+	if _place_blocked:
+		if not Input.is_action_pressed("hit"):
+			_place_blocked = false
+	elif active and selected != null and Input.is_action_just_pressed("hit"):
+		_try_place()
 
 
 # --- Placing ---

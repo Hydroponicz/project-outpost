@@ -35,6 +35,10 @@ extends CharacterBody3D
 ## movement input but still falls and slows to a stop.
 var controls_enabled: bool = true
 
+## Set when controls come back on (a menu closed). Jumping waits until the
+## jump button is released, so the A press that closed the menu doesn't jump.
+var _jump_blocked: bool = false
+
 ## Gamepad sprint is a toggle: click the left stick to start, and it stops
 ## when you let go of the stick (or click again).
 var _sprint_toggled: bool = false
@@ -61,6 +65,8 @@ func set_controls_enabled(enabled: bool) -> void:
 	_builder.enabled = enabled
 	if not enabled:
 		_sprint_toggled = false
+	else:
+		_jump_blocked = true
 
 
 func get_inventory() -> Inventory:
@@ -92,7 +98,9 @@ func _physics_process(delta: float) -> void:
 
 	# --- Jump ---
 	# Physics formula: the launch speed needed to reach jump_height.
-	if controls_enabled and Input.is_action_just_pressed("jump") and is_on_floor():
+	if _jump_blocked and not Input.is_action_pressed("jump"):
+		_jump_blocked = false
+	if controls_enabled and not _jump_blocked and Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = sqrt(2.0 * gravity * jump_height)
 
 	# --- Read input ---

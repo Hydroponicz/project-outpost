@@ -48,24 +48,28 @@ func close() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	# The same button that opened the menu closes it. (Handled as an event so
+	# the press that OPENED it isn't also seen as closing it.)
+	if is_open and event.is_action_pressed("build_menu"):
+		close()
+		get_viewport().set_input_as_handled()
+
+
+## Read once per frame as "just pressed" (an analog stick sends a stream of
+## events while held, which would skip several rows per push).
+func _process(_delta: float) -> void:
 	if not is_open:
 		return
-	var handled := true
-	if event.is_action_pressed("menu_cancel") or event.is_action_pressed("toggle_mouse_capture") \
-			or event.is_action_pressed("build_menu"):
+	if Input.is_action_just_pressed("menu_cancel") or Input.is_action_just_pressed("toggle_mouse_capture"):
 		close()
-	elif event.is_action_pressed("menu_accept"):
+	elif Input.is_action_just_pressed("menu_accept"):
 		_choose(_cursor)
-	elif event.is_action_pressed("menu_up"):
+	elif Input.is_action_just_pressed("menu_up"):
 		_cursor = maxi(_cursor - 1, 0)
 		_refresh()
-	elif event.is_action_pressed("menu_down"):
+	elif Input.is_action_just_pressed("menu_down"):
 		_cursor = mini(_cursor + 1, _rows.size() - 1)
 		_refresh()
-	else:
-		handled = false
-	if handled:
-		get_viewport().set_input_as_handled()
 
 
 func _choose(index: int) -> void:

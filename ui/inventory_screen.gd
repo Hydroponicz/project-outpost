@@ -87,37 +87,35 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 
+
+## Menu controls are read once per frame as "just pressed", not from input
+## events: an analog stick sends a stream of events while held, which would
+## skip several slots per push.
+func _process(_delta: float) -> void:
 	if not is_open:
 		return
-
-	var handled := true
-	if event.is_action_pressed("menu_cancel") or event.is_action_pressed("toggle_mouse_capture"):
+	if Input.is_action_just_pressed("menu_cancel") or Input.is_action_just_pressed("toggle_mouse_capture"):
 		if _held_from != -1:
 			_held_from = -1  # First press just puts the held stack back.
 			_refresh()
 		else:
 			close()
-	elif event.is_action_pressed("menu_accept"):
+	elif Input.is_action_just_pressed("menu_accept"):
 		if _area == Area.GRID:
 			_grab_or_drop(_cursor)
 		else:
 			_craft(_recipe_cursor)
-	elif event.is_action_pressed("drop_item"):
+	elif Input.is_action_just_pressed("drop_item"):
 		if _area == Area.GRID:
 			_drop_to_ground(_held_from if _held_from != -1 else _cursor)
-	elif event.is_action_pressed("menu_left"):
+	elif Input.is_action_just_pressed("menu_left"):
 		_move_highlight(-1, 0)
-	elif event.is_action_pressed("menu_right"):
+	elif Input.is_action_just_pressed("menu_right"):
 		_move_highlight(1, 0)
-	elif event.is_action_pressed("menu_up"):
+	elif Input.is_action_just_pressed("menu_up"):
 		_move_highlight(0, -1)
-	elif event.is_action_pressed("menu_down"):
+	elif Input.is_action_just_pressed("menu_down"):
 		_move_highlight(0, 1)
-	else:
-		handled = false
-
-	if handled:
-		get_viewport().set_input_as_handled()
 
 
 func open() -> void:
