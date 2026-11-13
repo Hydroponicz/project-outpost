@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/resources/forage_pickup.gd" id="1_forage"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="Resource" path="res://items/berries.tres" id="3_item"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_target"]
+size = Vector3(1.1, 0.9, 1.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_leaves"]
+albedo_color = Color(0.2, 0.45, 0.22, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bush"]
+material = SubResource("StandardMaterial3D_leaves")
+radius = 0.55
+height = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_berry"]
+albedo_color = Color(0.8, 0.12, 0.2, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_berry"]
+material = SubResource("StandardMaterial3D_berry")
+radius = 0.07
+height = 0.14
+
+[node name="BerryBush" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_forage")
+item = ExtResource("3_item")
+amount = 3
+respawn_time = 300.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+shape = SubResource("BoxShape3D_target")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Bush" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("SphereMesh_bush")
+
+[node name="Berry1" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.6, 0.3)
+mesh = SubResource("SphereMesh_berry")
+
+[node name="Berry2" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.5, 0.38)
+mesh = SubResource("SphereMesh_berry")
+
+[node name="Berry3" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.8, -0.4)
+mesh = SubResource("SphereMesh_berry")
+
+[node name="Berry4" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.7, -0.15)
+mesh = SubResource("SphereMesh_berry")
+
+[node name="Interactable" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+script = ExtResource("2_interactable")
+object_name = "Berry Bush"
+action_text = "Pick"

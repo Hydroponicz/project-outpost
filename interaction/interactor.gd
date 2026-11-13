@@ -22,6 +22,8 @@ signal hit_blocked(reason: String)
 @export var body: CharacterBody3D
 ## Which tool is in hand.
 @export var hotbar: Hotbar
+## Swings cost stamina.
+@export var vitals: Vitals
 ## How far the character can reach, in meters.
 @export var reach: float = 2.5
 ## Reach is measured from this height above the character's feet (about chest height).
@@ -98,6 +100,9 @@ func _try_hit() -> void:
 		return
 	if hotbar.is_holding(&"hammer"):
 		return  # With the hammer, Hit places build pieces instead.
+	var selected := hotbar.get_selected_stack()
+	if selected != null and selected.item.hunger_restore > 0.0:
+		return  # With food selected, Hit eats instead (see player.gd).
 	var hittable := Hittable.find_on(target)
 	if hittable == null:
 		return
@@ -106,6 +111,9 @@ func _try_hit() -> void:
 	var problem := hotbar.get_tool_problem(hittable.required_tool)
 	if problem != "":
 		hit_blocked.emit(problem)
+		return
+	if not vitals.use_stamina(vitals.swing_cost):
+		hit_blocked.emit("Too tired")
 		return
 
 	var held := hotbar.get_held_tool()

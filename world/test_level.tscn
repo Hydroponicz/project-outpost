@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://world/resources/rock.tscn" id="5_rock"]
 [ext_resource type="PackedScene" path="res://world/resources/branch.tscn" id="7_branch"]
 [ext_resource type="PackedScene" path="res://world/resources/loose_stone.tscn" id="8_loose_stone"]
+[ext_resource type="PackedScene" path="res://world/resources/berry_bush.tscn" id="10_berry_bush"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 
@@ -264,3 +265,79 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 16)
 
 [node name="LooseStone_10" parent="Forage" instance=ExtResource("8_loose_stone")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 17)
+
+[node name="BerryBushes" type="Node3D" parent="."]
+
+[node name="BerryBush_1" parent="BerryBushes" instance=ExtResource("10_berry_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 7)
+
+[node name="BerryBush_2" parent="BerryBushes" instance=ExtResource("10_berry_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 12)
+
+[node name="BerryBush_3" parent="BerryBushes" instance=ExtResource("10_berry_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 6)
+
+[node name="BerryBush_4" parent="BerryBushes" instance=ExtResource("10_berry_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 14)
+
+[node name="BerryBush_5" parent="BerryBushes" instance=ExtResource("10_berry_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 20)
+
+[node name="BerryBush_6" parent="BerryBushes" instance=ExtResource("10_berry_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 19)
+
+[node name="FallTestStairs" type="Node3D" parent="."]
+
+[node name="Step_1m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.0, 0.5, -12)
+use_collision = true
+size = Vector3(1.5, 1, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_2m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 1.0, -12)
+use_collision = true
+size = Vector3(1.5, 2, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_3m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.0, 1.5, -12)
+use_collision = true
+size = Vector3(1.5, 3, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_4m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 2.0, -12)
+use_collision = true
+size = Vector3(1.5, 4, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_5m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.0, 2.5, -12)
+use_collision = true
+size = Vector3(1.5, 5, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_6m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 3.0, -12)
+use_collision = true
+size = Vector3(1.5, 6, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_7m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0, 3.5, -12)
+use_collision = true
+size = Vector3(1.5, 7, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_8m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 4.0, -12)
+use_collision = true
+size = Vector3(1.5, 8, 1.5)
+material = SubResource("Mat_red")
+
+[node name="Step_9m" type="CSGBox3D" parent="FallTestStairs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0, 4.5, -12)
+use_collision = true
+size = Vector3(1.5, 9, 1.5)
+material = SubResource("Mat_red")

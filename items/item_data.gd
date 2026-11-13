@@ -17,6 +17,11 @@ extends Resource
 ## Gray-box placeholder: color of the dropped item cube until real art exists.
 @export var drop_color: Color = Color.WHITE
 
+@export_group("Food")
+## Hunger restored when eaten. 0 = not food. (Later, cooked foods will also
+## give temporary bonus max health / stamina; see the roadmap.)
+@export var hunger_restore: float = 0.0
+
 @export_group("Tool")
 ## What this tool can gather with, e.g. "axe" or "pickaxe". Empty = not a tool.
 ## Must match the "required_tool" of Hittables (trees need "axe", rocks "pickaxe").

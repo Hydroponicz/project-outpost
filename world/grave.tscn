@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/grave.gd" id="1_grave"]
+[ext_resource type="Script" path="res://inventory/inventory.gd" id="2_inventory"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="3_interactable"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_grave"]
+size = Vector3(0.6, 1.0, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_color = Color(0.6, 0.6, 0.65, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_stone"]
+material = SubResource("StandardMaterial3D_stone")
+size = Vector3(0.6, 1.0, 0.25)
+
+[node name="Grave" type="StaticBody3D"]
+script = ExtResource("1_grave")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_grave")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_stone")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Your grave"
+font_size = 40
+outline_size = 10
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("2_inventory")
+slot_count = 40
+max_weight = 0.0
+
+[node name="Interactable" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+script = ExtResource("3_interactable")
+object_name = "Grave"
+action_text = "Recover items from"
