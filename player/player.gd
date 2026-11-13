@@ -53,6 +53,7 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var _hotbar: Hotbar = $Hotbar
 @onready var _hud: HUD = $HUD
 @onready var _builder: Builder = $Builder
+@onready var _inventory_screen: InventoryScreen = $InventoryScreen
 
 
 ## Turns player control (movement, camera, hitting, interacting) on or off.
@@ -71,6 +72,11 @@ func set_controls_enabled(enabled: bool) -> void:
 
 func get_inventory() -> Inventory:
 	return _inventory
+
+
+## Opens the inventory screen next to a chest (or other container).
+func open_container(container: Inventory, title: String) -> void:
+	_inventory_screen.open_container(container, title)
 
 
 ## Shows a short message on screen, e.g. "Inventory full".

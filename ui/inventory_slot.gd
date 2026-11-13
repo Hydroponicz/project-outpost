@@ -7,9 +7,10 @@ extends PanelContainer
 ## Gamepad/keyboard: handled by the screen (ui/inventory_screen.gd).
 
 ## The mouse moved onto this slot.
-signal hovered(index: int)
-## A stack was dragged from slot "from_index" and dropped on this one.
-signal dropped(from_index: int, to_index: int)
+signal hovered(slot: InventorySlot)
+## A stack was dragged from another slot (maybe in another inventory, like a
+## chest) and dropped on this one.
+signal dropped(from_inventory: Inventory, from_index: int, to_slot: InventorySlot)
 
 const SIZE := Vector2(84, 84)
 
@@ -84,7 +85,7 @@ func _draw() -> void:
 
 
 func _on_mouse_entered() -> void:
-	hovered.emit(index)
+	hovered.emit(self)
 
 
 # --- Mouse drag and drop (Godot calls these automatically) ---
@@ -99,12 +100,12 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview.add_theme_color_override("font_outline_color", Color.BLACK)
 	preview.add_theme_constant_override("outline_size", 5)
 	set_drag_preview(preview)
-	return {"inventory_from": index}
+	return {"inventory": inventory, "index": index}
 
 
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
-	return data is Dictionary and data.has("inventory_from")
+	return data is Dictionary and data.has("inventory") and data.has("index")
 
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
-	dropped.emit(data["inventory_from"], index)
+	dropped.emit(data["inventory"], data["index"], self)
