@@ -48,7 +48,7 @@ func show_recipe(recipe: RecipeData, inventory: Inventory, craftable: bool, high
 
 ## Any row: a title, a detail line underneath, greyed out when not enabled.
 func show_entry(title: String, detail: String, enabled: bool, highlighted: bool) -> void:
-	_label.text = "%s\n%s" % [title, detail]
+	_label.text = title if detail == "" else "%s\n%s" % [title, detail]
 	modulate.a = 1.0 if enabled else 0.45
 	add_theme_stylebox_override("panel", _style_highlighted if highlighted else _style_normal)
 

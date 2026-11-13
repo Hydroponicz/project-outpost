@@ -35,6 +35,10 @@ extends CharacterBody3D
 ## movement input but still falls and slows to a stop.
 var controls_enabled: bool = true
 
+## Set when controls come back on (a menu closed). Jumping waits until the
+## jump button is released, so the A press that closed the menu doesn't jump.
+var _jump_blocked: bool = false
+
 ## Gamepad sprint is a toggle: click the left stick to start, and it stops
 ## when you let go of the stick (or click again).
 var _sprint_toggled: bool = false
@@ -48,6 +52,8 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var _collector: ItemCollector = $ItemCollector
 @onready var _hotbar: Hotbar = $Hotbar
 @onready var _hud: HUD = $HUD
+@onready var _builder: Builder = $Builder
+@onready var _inventory_screen: InventoryScreen = $InventoryScreen
 
 
 ## Turns player control (movement, camera, hitting, interacting) on or off.
@@ -57,12 +63,44 @@ func set_controls_enabled(enabled: bool) -> void:
 	_camera_rig.input_enabled = enabled
 	_interactor.enabled = enabled
 	_hotbar.enabled = enabled
+	_builder.enabled = enabled
 	if not enabled:
 		_sprint_toggled = false
+	else:
+		_jump_blocked = true
 
 
 func get_inventory() -> Inventory:
 	return _inventory
+
+
+## Everything about the player that goes in the save file.
+func get_save_data() -> Dictionary:
+	return {
+		"position": [global_position.x, global_position.y, global_position.z],
+		"facing": _visual.rotation.y,
+		"camera_yaw": _camera_rig.yaw,
+		"camera_pitch": _camera_rig.pitch,
+		"hotbar": _hotbar.selected,
+		"inventory": _inventory.get_save_data(),
+	}
+
+
+func apply_save_data(data: Dictionary) -> void:
+	var pos: Array = data.get("position", [0, 0, 0])
+	global_position = Vector3(pos[0], pos[1], pos[2])
+	velocity = Vector3.ZERO
+	reset_physics_interpolation()  # Teleport, don't slide from the old spot.
+	_visual.rotation.y = data.get("facing", 0.0)
+	_camera_rig.yaw = data.get("camera_yaw", 0.0)
+	_camera_rig.pitch = data.get("camera_pitch", _camera_rig.pitch)
+	_hotbar.select(int(data.get("hotbar", 0)))
+	_inventory.apply_save_data(data.get("inventory", []))
+
+
+## Opens the inventory screen next to a chest (or other container).
+func open_container(container: Inventory, title: String) -> void:
+	_inventory_screen.open_container(container, title)
 
 
 ## Shows a short message on screen, e.g. "Inventory full".
@@ -90,7 +128,9 @@ func _physics_process(delta: float) -> void:
 
 	# --- Jump ---
 	# Physics formula: the launch speed needed to reach jump_height.
-	if controls_enabled and Input.is_action_just_pressed("jump") and is_on_floor():
+	if _jump_blocked and not Input.is_action_pressed("jump"):
+		_jump_blocked = false
+	if controls_enabled and not _jump_blocked and Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = sqrt(2.0 * gravity * jump_height)
 
 	# --- Read input ---

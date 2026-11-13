@@ -130,6 +130,45 @@ func remove_item(item: ItemData, amount: int) -> int:
 	return amount - remaining
 
 
+## Puts a stack (or null) straight into a slot, replacing what was there.
+func set_slot(index: int, stack: ItemStack) -> void:
+	_ensure_slots()
+	_slots[index] = stack
+	changed.emit()
+
+
+func is_empty() -> bool:
+	_ensure_slots()
+	for stack in _slots:
+		if stack != null:
+			return false
+	return true
+
+
+## Like move_stack, but between two inventories (e.g. player <-> chest):
+## empty slot -> move, same item with room -> merge, anything else -> swap.
+static func transfer(from_inv: Inventory, from_index: int, to_inv: Inventory, to_index: int) -> void:
+	if from_inv == to_inv:
+		from_inv.move_stack(from_index, to_index)
+		return
+	var moving := from_inv.get_slot(from_index)
+	if moving == null:
+		return
+	var other := to_inv.get_slot(to_index)
+	if other == null:
+		to_inv.set_slot(to_index, moving)
+		from_inv.set_slot(from_index, null)
+	elif other.item == moving.item and other.space_left() > 0:
+		var moved := mini(moving.amount, other.space_left())
+		other.amount += moved
+		moving.amount -= moved
+		to_inv.changed.emit()
+		from_inv.set_slot(from_index, moving if moving.amount > 0 else null)
+	else:
+		to_inv.set_slot(to_index, moving)
+		from_inv.set_slot(from_index, other)
+
+
 ## Removes and returns the whole stack in a slot (null if it was empty).
 func take_slot(index: int) -> ItemStack:
 	_ensure_slots()
@@ -183,6 +222,35 @@ func get_total_weight() -> float:
 
 func is_overweight() -> bool:
 	return max_weight > 0.0 and get_total_weight() > max_weight
+
+
+# --- Saving ---
+
+## Slots as plain data for the save file: null, or {item, amount, durability}.
+func get_save_data() -> Array:
+	_ensure_slots()
+	var data: Array = []
+	for stack in _slots:
+		if stack == null:
+			data.append(null)
+		else:
+			data.append({"item": String(stack.item.id), "amount": stack.amount,
+					"durability": stack.durability})
+	return data
+
+
+func apply_save_data(data: Array) -> void:
+	_ensure_slots()
+	for i in _slots.size():
+		_slots[i] = null
+		if i >= data.size() or not data[i] is Dictionary:
+			continue
+		var entry: Dictionary = data[i]
+		var item := GameDatabase.get_item(StringName(entry.get("item", "")))
+		if item == null:
+			continue  # An item that no longer exists in the game.
+		_slots[i] = ItemStack.new(item, int(entry.get("amount", 1)), int(entry.get("durability", -1)))
+	changed.emit()
 
 
 ## Makes sure the slot list matches slot_count (safe to call any time).

@@ -15,13 +15,38 @@ extends StaticBody3D
 ## Seconds before it reappears after being picked up.
 @export var respawn_time: float = 180.0
 
+## Every forage pickup is in this group, so saving can find them.
+const GROUP := &"forage"
+
+## Seconds until it comes back; 0 while it's present.
+var respawn_left: float = 0.0
+
 @onready var _interactable: Interactable = $Interactable
 @onready var _shape: CollisionShape3D = $CollisionShape3D
 @onready var _visual: Node3D = $Visual
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	_interactable.interacted.connect(_on_interacted)
+
+
+func _process(delta: float) -> void:
+	if respawn_left > 0.0:
+		respawn_left -= delta
+		if respawn_left <= 0.0:
+			respawn_left = 0.0
+			_set_present(true)
+
+
+func is_present() -> bool:
+	return respawn_left <= 0.0
+
+
+## Used when loading a save: gone, coming back in "seconds".
+func set_gone(seconds: float) -> void:
+	respawn_left = maxf(seconds, 0.01)
+	_set_present(false)
 
 
 func _on_interacted(by: Node) -> void:
@@ -33,8 +58,7 @@ func _on_interacted(by: Node) -> void:
 		player.show_message("Inventory full")
 		return
 	inventory.add_item(item, amount)
-	_set_present(false)
-	get_tree().create_timer(respawn_time).timeout.connect(_set_present.bind(true))
+	set_gone(respawn_time)
 
 
 func _set_present(present: bool) -> void:

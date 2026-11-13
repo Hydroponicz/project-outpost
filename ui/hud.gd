@@ -13,6 +13,7 @@ const HOTBAR_SLOT_SIZE := Vector2(72, 72)
 @export var collector: ItemCollector
 @export var inventory: Inventory
 @export var hotbar: Hotbar
+@export var builder: Builder
 ## How long messages like "Inventory full" stay on screen, in seconds.
 @export var message_duration: float = 2.0
 
@@ -26,6 +27,7 @@ var _hotbar_slots: Array[InventorySlot] = []
 @onready var _message: Label = $Message
 @onready var _status: Label = $Status
 @onready var _hotbar_row: HBoxContainer = $Hotbar
+@onready var _build_hint: Label = $BuildHint
 
 
 func _ready() -> void:
@@ -46,6 +48,8 @@ func _ready() -> void:
 	inventory.changed.connect(_on_inventory_changed)
 	hotbar.selection_changed.connect(_on_hotbar_selection_changed)
 	InputPrompts.device_changed.connect(_on_device_changed)
+	builder.hint_changed.connect(_on_build_hint_changed)
+	_on_build_hint_changed("")
 	_on_target_changed(null)
 	_on_inventory_changed()
 
@@ -104,6 +108,11 @@ func _on_hotbar_selection_changed(_index: int) -> void:
 	_refresh_prompt_text()
 
 
+func _on_build_hint_changed(text: String) -> void:
+	_build_hint.text = text
+	_build_hint.visible = text != ""
+
+
 func _on_pickup_blocked() -> void:
 	show_message("Inventory full")
 
@@ -119,7 +128,7 @@ func _refresh_prompt_text() -> void:
 		return
 	var lines: PackedStringArray = []
 	var hittable := Hittable.find_on(_target)
-	if hittable != null:
+	if hittable != null and not hotbar.is_holding(&"hammer"):
 		lines.append("[%s] %s" % [InputPrompts.get_label(&"hit"), hittable.get_prompt_text()])
 		var problem := hotbar.get_tool_problem(hittable.required_tool)
 		if problem != "":

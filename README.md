@@ -13,11 +13,13 @@ Open `project.godot` in Godot and press F5 (Run Project). See `docs/ROADMAP.md` 
 | Jump | Space | A / Cross |
 | Zoom | Scroll wheel | Hold d-pad up / down |
 | Hit (hold to keep swinging) | Left mouse | RT / R2 |
-| Interact / pick up branches and stones | E | X / Square |
+| Interact / pick up / open chest | E | X / Square |
 | Inventory | Tab | View / Select (Share on PlayStation) |
 | Move items (in inventory) | Drag with mouse | Highlight, A to grab, A to drop, B to cancel |
 | Drop stack (in inventory) | Q, or drag it outside the panel | Y / Triangle |
 | Pick hotbar slot | 1-8 | LB / RB |
-| Free / grab mouse | Esc (click to grab again) | Start |
+| Build menu (hammer selected) | Right mouse | Y / Triangle |
+| Place / rotate / remove piece | Left mouse / Scroll / Middle mouse | RT / D-pad left-right / B |
+| Pause menu (resume, save, quit) | Esc | Start |
 
 Plan: `docs/ROADMAP.md` · How updates are tested and merged: `docs/WORKFLOW.md`
