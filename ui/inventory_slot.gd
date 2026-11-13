@@ -15,6 +15,11 @@ const SIZE := Vector2(84, 84)
 
 var index: int = -1
 var inventory: Inventory
+## Hotbar number shown in the corner (1-8). 0 = not a hotbar slot.
+var hotkey: int = 0
+
+## Durability bar: 0..1, or -1 for "no bar".
+var _durability_ratio: float = -1.0
 
 var _label := Label.new()
 var _style_normal := StyleBoxFlat.new()
@@ -48,6 +53,8 @@ func _init() -> void:
 func show_stack(stack: ItemStack, dimmed: bool) -> void:
 	_label.text = get_stack_text(stack)
 	modulate.a = 0.35 if dimmed else 1.0
+	_durability_ratio = stack.get_durability_ratio() if stack != null else -1.0
+	queue_redraw()
 
 
 func set_highlighted(highlighted: bool) -> void:
@@ -57,7 +64,23 @@ func set_highlighted(highlighted: bool) -> void:
 static func get_stack_text(stack: ItemStack) -> String:
 	if stack == null:
 		return ""
+	if stack.item.max_stack == 1:
+		# Single items (tools) don't need a count.
+		return stack.item.display_name + ("\n(broken)" if stack.is_broken() else "")
 	return "%s\n%d" % [stack.item.display_name, stack.amount]
+
+
+## Draws the hotbar number and the durability bar on top of the panel.
+func _draw() -> void:
+	if hotkey > 0:
+		var font := get_theme_default_font()
+		draw_string(font, Vector2(6, 16), str(hotkey), HORIZONTAL_ALIGNMENT_LEFT, -1, 13,
+				Color(1, 1, 1, 0.6))
+	if _durability_ratio >= 0.0:
+		var bar := Rect2(6, size.y - 9, size.x - 12, 4)
+		draw_rect(bar, Color(0, 0, 0, 0.6))
+		var fill := Color(0.9, 0.25, 0.2).lerp(Color(0.4, 0.85, 0.3), _durability_ratio)
+		draw_rect(Rect2(bar.position, Vector2(bar.size.x * _durability_ratio, bar.size.y)), fill)
 
 
 func _on_mouse_entered() -> void:

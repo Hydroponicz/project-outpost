@@ -46,6 +46,8 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var _interactor: Interactor = $Interactor
 @onready var _inventory: Inventory = $Inventory
 @onready var _collector: ItemCollector = $ItemCollector
+@onready var _hotbar: Hotbar = $Hotbar
+@onready var _hud: HUD = $HUD
 
 
 ## Turns player control (movement, camera, hitting, interacting) on or off.
@@ -54,16 +56,27 @@ func set_controls_enabled(enabled: bool) -> void:
 	controls_enabled = enabled
 	_camera_rig.input_enabled = enabled
 	_interactor.enabled = enabled
+	_hotbar.enabled = enabled
 	if not enabled:
 		_sprint_toggled = false
 
 
+func get_inventory() -> Inventory:
+	return _inventory
+
+
+## Shows a short message on screen, e.g. "Inventory full".
+func show_message(text: String) -> void:
+	_hud.show_message(text)
+
+
 ## Drops items on the ground in front of the character, as one bundle.
-func drop_items(item: ItemData, amount: int) -> void:
+## "durability" keeps a worn tool worn (-1 = not a tool / brand new).
+func drop_items(item: ItemData, amount: int, durability: int = -1) -> void:
 	var forward := -_visual.global_basis.z  # The way the character faces.
 	var at := global_position + forward * 0.8 + Vector3.UP * 1.2
 	var toss := forward * 2.5 + Vector3.UP * 2.0
-	_collector.drop(item, amount, at, toss)
+	_collector.drop(item, amount, at, toss, durability)
 
 
 func _physics_process(delta: float) -> void:

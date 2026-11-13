@@ -169,6 +169,56 @@ drop_item={
 , Object(InputEventJoypadButton,"device":-1,"button_index":3,"pressed":false,"script":null)
 ]
 }
+hotbar_1={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":49,"script":null)
+]
+}
+hotbar_2={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":50,"script":null)
+]
+}
+hotbar_3={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":51,"script":null)
+]
+}
+hotbar_4={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":52,"script":null)
+]
+}
+hotbar_5={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":53,"script":null)
+]
+}
+hotbar_6={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":54,"script":null)
+]
+}
+hotbar_7={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":55,"script":null)
+]
+}
+hotbar_8={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":56,"script":null)
+]
+}
+hotbar_next={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":10,"pressed":false,"script":null)
+]
+}
+hotbar_prev={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":9,"pressed":false,"script":null)
+]
+}
 toggle_mouse_capture={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194305,"script":null)
@@ -181,6 +231,7 @@ toggle_mouse_capture={
 3d_physics/layer_1="World"
 3d_physics/layer_2="Player"
 3d_physics/layer_3="Pickups"
+3d_physics/layer_4="Forage"
 
 [physics]
 

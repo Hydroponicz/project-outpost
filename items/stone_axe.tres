@@ -9,3 +9,6 @@ display_name = "Stone Axe"
 max_stack = 1
 weight = 2.5
 drop_color = Color(0.35, 0.3, 0.25, 1)
+tool_type = &"axe"
+tool_damage = 1
+max_durability = 50

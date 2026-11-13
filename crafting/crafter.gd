@@ -11,6 +11,8 @@ const RECIPE_FOLDER := "res://crafting/recipes/"
 @export var inventory: Inventory
 ## The player's body, used to measure distance to stations.
 @export var body: Node3D
+## Station where tools can be repaired (for free).
+@export var repair_station: StringName = &"workbench"
 
 ## Every recipe found in RECIPE_FOLDER.
 var recipes: Array[RecipeData] = []
@@ -61,6 +63,17 @@ func craft(recipe: RecipeData) -> bool:
 		inventory.remove_item(ingredient.item, ingredient.amount)
 	inventory.add_item(recipe.output, recipe.output_amount)
 	return true
+
+
+func can_repair_here() -> bool:
+	return is_station_near(repair_station)
+
+
+## Repairs every worn tool in the inventory. Returns how many were repaired.
+func repair_all() -> int:
+	if not can_repair_here():
+		return 0
+	return inventory.repair_all()
 
 
 func _load_recipes() -> void:

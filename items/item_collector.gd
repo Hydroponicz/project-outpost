@@ -48,7 +48,7 @@ func get_attract_point() -> Vector3:
 ## Called when a pickup arrives. Adds as much as fits. Returns false if some
 ## is left over; the pickup then keeps the rest and drops back to the ground.
 func collect(pickup: ItemPickup) -> bool:
-	var leftover := inventory.add_item(pickup.item, pickup.amount)
+	var leftover := inventory.add_item(pickup.item, pickup.amount, pickup.durability)
 	if leftover > 0:
 		pickup.amount = leftover
 		_report_blocked()
@@ -57,10 +57,11 @@ func collect(pickup: ItemPickup) -> bool:
 
 
 ## Spawns items the player dropped, as one bundle.
-func drop(item: ItemData, amount: int, at: Vector3, velocity: Vector3) -> void:
+func drop(item: ItemData, amount: int, at: Vector3, velocity: Vector3, durability: int = -1) -> void:
 	var pickup: ItemPickup = PICKUP_SCENE.instantiate()
 	pickup.item = item
 	pickup.amount = amount
+	pickup.durability = durability
 	pickup.dropped_by_player = true
 	get_tree().current_scene.add_child(pickup)
 	pickup.global_position = at

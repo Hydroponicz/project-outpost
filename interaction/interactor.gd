@@ -15,9 +15,13 @@ extends Node
 ## Emitted when the target changes. "target" is the targeted physics body,
 ## or null when nothing is targeted.
 signal target_changed(target: Node3D)
+## Emitted when a hit doesn't happen because of the tool, e.g. "Needs an Axe".
+signal hit_blocked(reason: String)
 
 @export var camera: Camera3D
 @export var body: CharacterBody3D
+## Which tool is in hand.
+@export var hotbar: Hotbar
 ## How far the character can reach, in meters.
 @export var reach: float = 2.5
 ## Reach is measured from this height above the character's feet (about chest height).
@@ -26,7 +30,8 @@ signal target_changed(target: Node3D)
 @export var ray_length: float = 20.0
 
 @export_group("Hitting")
-## Damage per hit. Bare hands = 1. Tools will raise this in a later step.
+## Damage per hit with bare hands (only on things that need no tool).
+## With a tool, the tool's own damage is used.
 @export var hit_damage: int = 1
 ## Seconds between swings. Holding the hit button keeps swinging.
 @export var hit_cooldown: float = 0.8
@@ -94,8 +99,19 @@ func _try_hit() -> void:
 	var hittable := Hittable.find_on(target)
 	if hittable == null:
 		return
-	hittable.take_hit(body, hit_damage)
-	_cooldown_left = hit_cooldown
+	_cooldown_left = hit_cooldown  # Even a blocked swing takes time.
+
+	var problem := hotbar.get_tool_problem(hittable.required_tool)
+	if problem != "":
+		hit_blocked.emit(problem)
+		return
+
+	var held := hotbar.get_held_tool()
+	if hittable.required_tool != &"" and held != null:
+		hittable.take_hit(body, held.item.tool_damage)
+		hotbar.use_held_tool()
+	else:
+		hittable.take_hit(body, hit_damage)
 
 
 func _find_target() -> Node3D:
@@ -103,7 +119,8 @@ func _find_target() -> Node3D:
 	var to := from - camera.global_basis.z * ray_length  # Cameras look along -Z.
 
 	var query := PhysicsRayQueryParameters3D.create(from, to)
-	query.collision_mask = 1  # World layer only: skips the player and dropped items.
+	# World (layer 1) + Forage (layer 4). Skips the player and dropped items.
+	query.collision_mask = 1 | 8
 	query.exclude = [body.get_rid()]
 
 	var hit := body.get_world_3d().direct_space_state.intersect_ray(query)

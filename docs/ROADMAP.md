@@ -14,6 +14,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 - Resources do not regrow by themselves; trees are replanted by the player (later)
 - Dropped items are separate pieces, auto-vacuumed into the player when in range
 - Crafting is instant and done by the player; timed processing (smelting etc.) is for workers
+- Trees need an axe and rocks a pickaxe; first materials come from forage (branches, loose stones) which respawns
+- Tools wear out; repair is free at a workbench; the top inventory row is the hotbar
 
 ## Systems (built in order, each one finished before the next)
 1. [x] Player controller: movement, camera, jump, sprint
@@ -21,8 +23,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 3. [x] Resources and gathering
 4. [x] Inventory
 5. [x] Crafting: recipes by hand and at stations (test workbench placed in the level)
-6. [ ] Tools: equipping and using crafted tools (axe, pickaxe)  ← next
-7. [ ] Building (the workbench becomes buildable here)
+6. [x] Tools: hotbar, axe/pickaxe required for trees/rocks, durability with free repair, forage
+7. [ ] Building (the workbench becomes buildable here)  ← next
 8. [ ] Survival pressure (health, hunger, stamina)
 9. [ ] Workers v1: one worker gathers into a chest
 10. [ ] Production chains: workers run timed processing stations
@@ -33,5 +35,5 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 - Combat, enemies, bosses
 - Biomes
 - Multiplayer
-- Animations, crouch, swim, climb, step-up on stairs
+- Animations (incl. tool swings; held tool is a static placeholder), crouch, swim, climb, step-up on stairs
 - Settings menu (sensitivity, key rebinding)

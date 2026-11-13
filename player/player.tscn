@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://bjcfafm0igvb0" path="res://inventory/inventory.gd" id="6_inventory"]
 [ext_resource type="PackedScene" path="res://ui/inventory_screen.tscn" id="7_inventory_screen"]
 [ext_resource type="Script" path="res://crafting/crafter.gd" id="8_crafter"]
+[ext_resource type="Script" path="res://player/hotbar.gd" id="9_hotbar"]
+[ext_resource type="Script" path="res://player/held_item_view.gd" id="10_held_item"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -42,6 +44,10 @@ script = ExtResource("1_player")
 [node name="Inventory" type="Node" parent="." unique_id=2055477740]
 script = ExtResource("6_inventory")
 
+[node name="Hotbar" type="Node" parent="." node_paths=PackedStringArray("inventory")]
+script = ExtResource("9_hotbar")
+inventory = NodePath("../Inventory")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=868599940]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_body")
@@ -55,6 +61,12 @@ mesh = SubResource("CapsuleMesh_body")
 [node name="Nose" type="MeshInstance3D" parent="Visual" unique_id=585945528]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, -0.4)
 mesh = SubResource("BoxMesh_nose")
+
+[node name="HandAnchor" type="Node3D" parent="Visual" node_paths=PackedStringArray("hotbar", "inventory")]
+transform = Transform3D(1, 0, 0, 0, 0.866, -0.5, 0, 0.5, 0.866, 0.45, 0.85, -0.2)
+script = ExtResource("10_held_item")
+hotbar = NodePath("../../Hotbar")
+inventory = NodePath("../../Inventory")
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1084577326 node_paths=PackedStringArray("target")]
 physics_interpolation_mode = 2
@@ -74,10 +86,11 @@ margin = 0.1
 current = true
 fov = 70.0
 
-[node name="Interactor" type="Node" parent="." unique_id=1526039786 node_paths=PackedStringArray("camera", "body")]
+[node name="Interactor" type="Node" parent="." unique_id=1526039786 node_paths=PackedStringArray("camera", "body", "hotbar")]
 script = ExtResource("3_interactor")
 camera = NodePath("../CameraRig/PitchPivot/SpringArm3D/Camera3D")
 body = NodePath("..")
+hotbar = NodePath("../Hotbar")
 
 [node name="ItemCollector" type="Area3D" parent="." unique_id=948616714 node_paths=PackedStringArray("inventory")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -89,10 +102,11 @@ inventory = NodePath("../Inventory")
 [node name="PickupRange" type="CollisionShape3D" parent="ItemCollector" unique_id=669767707]
 shape = SubResource("SphereShape3D_pickup_range")
 
-[node name="HUD" parent="." unique_id=1625009259 node_paths=PackedStringArray("interactor", "collector", "inventory") instance=ExtResource("4_hud")]
+[node name="HUD" parent="." unique_id=1625009259 node_paths=PackedStringArray("interactor", "collector", "inventory", "hotbar") instance=ExtResource("4_hud")]
 interactor = NodePath("../Interactor")
 collector = NodePath("../ItemCollector")
 inventory = NodePath("../Inventory")
+hotbar = NodePath("../Hotbar")
 
 [node name="Crafter" type="Node" parent="." node_paths=PackedStringArray("inventory", "body")]
 script = ExtResource("8_crafter")

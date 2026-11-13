@@ -45,8 +45,9 @@ func can_add(item: ItemData, amount: int) -> bool:
 
 
 ## Adds items, filling existing stacks first, then empty slots.
+## "durability" is for tools picked back up (-1 = brand new).
 ## Returns how many did NOT fit (0 = all added).
-func add_item(item: ItemData, amount: int) -> int:
+func add_item(item: ItemData, amount: int, durability: int = -1) -> int:
 	_ensure_slots()
 	var remaining := amount
 
@@ -63,7 +64,7 @@ func add_item(item: ItemData, amount: int) -> int:
 			break
 		if _slots[i] == null:
 			var moved := mini(remaining, item.max_stack)
-			_slots[i] = ItemStack.new(item, moved)
+			_slots[i] = ItemStack.new(item, moved, durability)
 			remaining -= moved
 
 	if remaining != amount:
@@ -72,7 +73,8 @@ func add_item(item: ItemData, amount: int) -> int:
 
 
 ## Moves the stack in "from" onto slot "to":
-##   empty slot -> move, same item -> merge (extra stays behind), other item -> swap.
+##   empty slot -> move, same item with room -> merge (extra stays behind),
+##   anything else -> swap.
 func move_stack(from: int, to: int) -> void:
 	_ensure_slots()
 	if from == to:
@@ -85,7 +87,7 @@ func move_stack(from: int, to: int) -> void:
 	if other == null:
 		_slots[to] = moving
 		_slots[from] = null
-	elif other.item == moving.item:
+	elif other.item == moving.item and other.space_left() > 0:
 		var moved := mini(moving.amount, other.space_left())
 		other.amount += moved
 		moving.amount -= moved
@@ -136,6 +138,38 @@ func take_slot(index: int) -> ItemStack:
 		_slots[index] = null
 		changed.emit()
 	return stack
+
+
+## Wears down the tool in a slot. Returns false if there's nothing to wear.
+func use_durability(index: int, amount: int = 1) -> bool:
+	_ensure_slots()
+	var stack := _slots[index]
+	if stack == null or not stack.has_durability():
+		return false
+	stack.durability = maxi(stack.durability - amount, 0)
+	changed.emit()
+	return true
+
+
+func has_damaged_items() -> bool:
+	_ensure_slots()
+	for stack in _slots:
+		if stack != null and stack.is_damaged():
+			return true
+	return false
+
+
+## Restores every tool to full durability. Returns how many were repaired.
+func repair_all() -> int:
+	_ensure_slots()
+	var repaired := 0
+	for stack in _slots:
+		if stack != null and stack.is_damaged():
+			stack.durability = stack.item.max_durability
+			repaired += 1
+	if repaired > 0:
+		changed.emit()
+	return repaired
 
 
 func get_total_weight() -> float:
