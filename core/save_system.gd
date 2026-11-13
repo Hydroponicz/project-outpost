@@ -20,6 +20,7 @@ const WORLD_SCENE := "res://world/test_level.tscn"
 const TITLE_SCENE := "res://ui/title_screen.tscn"
 const PICKUP_SCENE := preload("res://items/item_pickup.tscn")
 const GRAVE_SCENE := preload("res://world/grave.tscn")
+const SAPLING_SCENE := preload("res://world/resources/sapling.tscn")
 
 ## Seconds between autosaves.
 var autosave_interval: float = 300.0
@@ -113,12 +114,38 @@ func save_game() -> bool:
 func _collect(world: World) -> Dictionary:
 	var data := {"version": SAVE_VERSION, "player": world.get_player().get_save_data()}
 
-	# Trees/rocks still standing, with their health. Missing = chopped down.
+	# Level trees/rocks still standing, with their health. Missing = chopped
+	# down. Trees that grew from planted saplings are saved separately.
 	var resources := {}
+	var planted: Array = []
 	for node in get_tree().get_nodes_in_group(ResourceNode.GROUP):
-		if not node.is_queued_for_deletion():
-			resources[str(world.get_path_to(node))] = (node as ResourceNode).get_health()
+		var resource := node as ResourceNode
+		if resource.is_queued_for_deletion():
+			continue
+		if resource.is_planted:
+			var pos := resource.global_position
+			planted.append({"scene": resource.scene_file_path, "position": [pos.x, pos.y, pos.z],
+					"health": resource.get_health()})
+		else:
+			resources[str(world.get_path_to(resource))] = resource.get_health()
 	data["resource_nodes"] = resources
+	data["planted_trees"] = planted
+
+	# Growing saplings.
+	var saplings: Array = []
+	for node in get_tree().get_nodes_in_group(Sapling.GROUP):
+		var sapling := node as Sapling
+		if not sapling.is_queued_for_deletion():
+			var pos := sapling.global_position
+			saplings.append({"position": [pos.x, pos.y, pos.z], "age": sapling.age})
+	data["saplings"] = saplings
+
+	# Workers (and which workplace each one is assigned to).
+	var workers: Array = []
+	for node in get_tree().get_nodes_in_group(Worker.GROUP):
+		if not node.is_queued_for_deletion():
+			workers.append((node as Worker).get_save_data())
+	data["workers"] = workers
 
 	# Forage that's been picked, with seconds until it comes back.
 	var forage := {}
@@ -217,6 +244,39 @@ func _load_into(world: World) -> void:
 		var grave: Grave = GRAVE_SCENE.instantiate()
 		world.add_child(grave)
 		grave.apply_save_data(entry)
+
+	for entry: Dictionary in data.get("planted_trees", []):
+		var scene := load(str(entry.get("scene", ""))) as PackedScene
+		if scene == null:
+			continue
+		var tree: ResourceNode = scene.instantiate()
+		tree.is_planted = true
+		world.add_child(tree)
+		var pos: Array = entry.get("position", [0, 0, 0])
+		tree.global_position = Vector3(pos[0], pos[1], pos[2])
+		tree.set_health(int(entry.get("health", tree.max_health)))
+
+	for entry: Dictionary in data.get("saplings", []):
+		var sapling: Sapling = SAPLING_SCENE.instantiate()
+		sapling.age = float(entry.get("age", 0.0))
+		world.add_child(sapling)
+		var pos: Array = entry.get("position", [0, 0, 0])
+		sapling.global_position = Vector3(pos[0], pos[1], pos[2])
+
+	# Workers: the saved list replaces the ones placed in the level.
+	if data.has("workers"):
+		for node in get_tree().get_nodes_in_group(Worker.GROUP):
+			node.remove_from_group(Worker.GROUP)  # So it's not saved again...
+			node.queue_free()  # ...and gone at the end of this frame.
+		for entry: Dictionary in data.get("workers", []):
+			var scene := load(str(entry.get("scene", ""))) as PackedScene
+			if scene == null:
+				continue
+			var worker: Worker = scene.instantiate()
+			world.add_child(worker)
+			worker.apply_save_data(entry)
+
+	world.request_nav_rebake()
 
 
 # --- Helpers ---

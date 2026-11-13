@@ -1,0 +1,88 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://building/workplace.gd" id="1_workplace"]
+[ext_resource type="Script" path="res://inventory/inventory.gd" id="2_inventory"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="3_interactable"]
+[ext_resource type="Script" path="res://building/build_piece.gd" id="4_piece"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_post"]
+size = Vector3(1.2, 1.6, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.55, 0.38, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pole"]
+material = SubResource("StandardMaterial3D_wood")
+size = Vector3(0.15, 1.6, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_box"]
+material = SubResource("StandardMaterial3D_wood")
+size = Vector3(1.0, 0.5, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sign"]
+albedo_color = Color(0.8, 0.65, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sign"]
+material = SubResource("StandardMaterial3D_sign")
+size = Vector3(0.7, 0.35, 0.05)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.85, 0.4, 0.35)
+
+[sub_resource type="TorusMesh" id="TorusMesh_ring"]
+material = SubResource("StandardMaterial3D_ring")
+inner_radius = 19.9
+outer_radius = 20.1
+rings = 96
+ring_segments = 4
+
+[node name="WoodcutterPost" type="StaticBody3D"]
+script = ExtResource("1_workplace")
+job = &"woodcutter"
+display_name = "Woodcutter's Post"
+work_radius = 20.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("BoxShape3D_post")
+
+[node name="Pole" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.8, 0)
+mesh = SubResource("BoxMesh_pole")
+
+[node name="Box" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.25, 0)
+mesh = SubResource("BoxMesh_box")
+
+[node name="Sign" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 1.35, 0.1)
+mesh = SubResource("BoxMesh_sign")
+
+[node name="RadiusRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+cast_shadow = 0
+mesh = SubResource("TorusMesh_ring")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+billboard = 1
+text = "Woodcutter's Post"
+font_size = 40
+outline_size = 10
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("2_inventory")
+slot_count = 8
+max_weight = 0.0
+
+[node name="Interactable" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+script = ExtResource("3_interactable")
+object_name = "Woodcutter's Post"
+action_text = "Open"
+
+[node name="BuildPiece" type="Node" parent="."]
+script = ExtResource("4_piece")
+piece_id = &"woodcutter_post"

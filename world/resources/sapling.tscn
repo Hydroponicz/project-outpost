@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/resources/sapling.gd" id="1_sapling"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stem"]
+albedo_color = Color(0.45, 0.3, 0.18, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_stem"]
+material = SubResource("StandardMaterial3D_stem")
+top_radius = 0.03
+bottom_radius = 0.05
+height = 0.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_leaves"]
+albedo_color = Color(0.3, 0.65, 0.3, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_leaves"]
+material = SubResource("StandardMaterial3D_leaves")
+radius = 0.3
+height = 0.5
+
+[node name="Sapling" type="Node3D"]
+script = ExtResource("1_sapling")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Stem" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("CylinderMesh_stem")
+
+[node name="Leaves" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+mesh = SubResource("SphereMesh_leaves")

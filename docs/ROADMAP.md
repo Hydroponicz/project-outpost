@@ -19,6 +19,9 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 - Building uses the hammer and Valheim-style snap points; no workbench needed nearby; removing refunds fully
 - Chests (16 slots) open next to your inventory; a chest with items in it can't be removed
 - Hunger is a draining meter (Palworld-style); workers will share the food supply later. Dying drops everything in a grave you can recover
+- Every workplace has its own small storage; workers deliver there. Moving goods between storages is a job of its own (haulers, warehouse) later
+- Planting saplings is a separate step in the worker routine, so it can become its own Forester job later
+- Workers use Godot's navigation (navmesh rebuilt in the background when the world changes); all movement goes through one function so it can be swapped
 
 ## Systems (built in order, each one finished before the next)
 1. [x] Player controller: movement, camera, jump, sprint
@@ -30,12 +33,14 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 7. [x] Building: hammer, snap-point placement, workbench/floor/wall, then a chest
 8. [x] Saving and loading: title screen, pause menu, autosave every 5 min and on quit
 9. [x] Survival pressure: health, stamina, hunger (drains; starving hurts), fall damage, graves, berries
-10. [ ] Workers v1: one worker gathers into a chest  ← next
+10. [ ] Workers v1: Woodcutter's Post (own 8-slot storage, 20 m radius), test worker chops, delivers, replants saplings  ← current
 11. [ ] Production chains: workers run timed processing stations; cooking, incl. endgame foods that give big temporary max health / stamina bonuses
 12. [ ] Recruitment
 
 ## Later, maybe (not now)
-- Replanting trees from saplings/seeds (trees never regrow on their own; also a worker job)
+- Forester job (planting saplings separately from chopping)
+- Haulers and a warehouse (moving goods between workplace storages)
+- Worker hunger (after cooking exists)
 - Combat, enemies, bosses
 - Biomes
 - Multiplayer

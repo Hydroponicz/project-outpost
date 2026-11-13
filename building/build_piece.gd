@@ -14,6 +14,12 @@ const GROUP := &"build_pieces"
 
 func _ready() -> void:
 	add_to_group(GROUP)
+	get_tree().call_group(&"world", &"request_nav_rebake")  # Workers walk around it.
+
+
+func _exit_tree() -> void:
+	if is_inside_tree():
+		get_tree().call_group(&"world", &"request_nav_rebake")
 
 
 ## World positions of this piece's snap points.

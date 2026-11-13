@@ -37,6 +37,12 @@ extends CharacterBody3D
 ## Damage per meter fallen beyond the safe height.
 @export var fall_damage_per_meter: float = 10.0
 
+@export_group("Planting")
+## How far away (from the character) you can plant.
+@export var plant_reach: float = 4.0
+## Saplings can't be planted closer than this to a tree or another sapling.
+@export var plant_spacing: float = 2.0
+
 const GRAVE_SCENE := preload("res://world/grave.tscn")
 
 ## False while a menu (like the inventory) is open: the character ignores
@@ -243,7 +249,8 @@ func _update_fall_damage() -> void:
 	_was_on_floor = on_floor
 
 
-## Hit (LMB / RT) with food selected on the hotbar eats one.
+## Hit (LMB / RT) with food selected eats one; with a sapling selected,
+## plants it where you're aiming.
 func _try_eat() -> void:
 	if _eat_blocked:
 		if not Input.is_action_pressed("hit"):
@@ -252,7 +259,12 @@ func _try_eat() -> void:
 	if not controls_enabled or not Input.is_action_just_pressed("hit"):
 		return
 	var stack := _hotbar.get_selected_stack()
-	if stack == null or stack.item.hunger_restore <= 0.0:
+	if stack == null:
+		return
+	if stack.item.plant_scene != null:
+		_try_plant(stack.item)
+		return
+	if stack.item.hunger_restore <= 0.0:
 		return
 	if _vitals.eat(stack.item):
 		_inventory.remove_item(stack.item, 1)
@@ -274,3 +286,30 @@ func _on_died() -> void:
 	_fall_start_y = global_position.y
 	_vitals.reset(0.5)  # Back with full health and stamina, half hunger.
 	show_message("You died. Your items are in your grave.")
+
+
+func _try_plant(item: ItemData) -> void:
+	var camera := get_viewport().get_camera_3d()
+	var from := camera.global_position
+	var query := PhysicsRayQueryParameters3D.create(from, from - camera.global_basis.z * 30.0)
+	query.collision_mask = 1  # The ground and other solid things.
+	query.exclude = [get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty() or global_position.distance_to(hit.position) > plant_reach:
+		show_message("Aim at the ground nearby")
+		return
+	var normal: Vector3 = hit.normal
+	if normal.y < 0.7 or BuildPiece.find_on(hit.collider) != null:
+		show_message("Plant it on open ground")
+		return
+	var spot: Vector3 = hit.position
+	for group in [ResourceNode.GROUP, Sapling.GROUP]:
+		for node in get_tree().get_nodes_in_group(group):
+			var other := node as Node3D
+			if other.global_position.distance_to(spot) < plant_spacing:
+				show_message("Too close to another tree")
+				return
+	var plant: Node3D = item.plant_scene.instantiate()
+	get_tree().current_scene.add_child(plant)
+	plant.global_position = spot
+	_inventory.remove_item(item, 1)

@@ -101,8 +101,8 @@ func _try_hit() -> void:
 	if hotbar.is_holding(&"hammer"):
 		return  # With the hammer, Hit places build pieces instead.
 	var selected := hotbar.get_selected_stack()
-	if selected != null and selected.item.hunger_restore > 0.0:
-		return  # With food selected, Hit eats instead (see player.gd).
+	if selected != null and (selected.item.hunger_restore > 0.0 or selected.item.plant_scene != null):
+		return  # With food / a sapling selected, Hit eats / plants instead (see player.gd).
 	var hittable := Hittable.find_on(target)
 	if hittable == null:
 		return
@@ -129,8 +129,9 @@ func _find_target() -> Node3D:
 	var to := from - camera.global_basis.z * ray_length  # Cameras look along -Z.
 
 	var query := PhysicsRayQueryParameters3D.create(from, to)
-	# World (layer 1) + Forage (layer 4). Skips the player and dropped items.
-	query.collision_mask = 1 | 8
+	# World (layer 1) + Forage (layer 4) + Workers (layer 5).
+	# Skips the player and dropped items.
+	query.collision_mask = 1 | 8 | 16
 	query.exclude = [body.get_rid()]
 
 	var hit := body.get_world_3d().direct_space_state.intersect_ray(query)

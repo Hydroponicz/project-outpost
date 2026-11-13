@@ -22,6 +22,11 @@ extends Resource
 ## give temporary bonus max health / stamina; see the roadmap.)
 @export var hunger_restore: float = 0.0
 
+@export_group("Planting")
+## Scene placed in the world when this is planted (e.g. a sapling).
+## Empty = can't be planted. Select it on the hotbar and Hit the ground.
+@export var plant_scene: PackedScene
+
 @export_group("Tool")
 ## What this tool can gather with, e.g. "axe" or "pickaxe". Empty = not a tool.
 ## Must match the "required_tool" of Hittables (trees need "axe", rocks "pickaxe").
