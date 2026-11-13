@@ -27,6 +27,10 @@ const ROTATION_STEP := 0.39269908  # 22.5 degrees, in radians.
 @export var build_menu: BuildMenu
 ## How far away (from the character) you can place and remove pieces.
 @export var build_range: float = 8.0
+## How much (in meters, per side) pieces may overlap and still be placed.
+## Needed because walls stand centered on floor edges, so floors on top of
+## walls and walls meeting at corners overlap by a sliver.
+@export var overlap_tolerance: float = 0.125
 @export var ghost_color_ok: Color = Color(0.3, 1.0, 0.4, 0.4)
 @export var ghost_color_blocked: Color = Color(1.0, 0.3, 0.3, 0.4)
 
@@ -214,7 +218,8 @@ func _floor_edge_placement(target: BuildPiece, aim: Vector3) -> Transform3D:
 
 
 ## True if the selected piece at "xform" would overlap the world or the player.
-## The shape is shrunk slightly, so pieces that only touch are fine.
+## The shape is shrunk by overlap_tolerance, so touching or slightly
+## overlapping pieces are fine.
 func _overlaps(xform: Transform3D) -> bool:
 	var template: PieceTemplate = _templates[selected]
 	if template.query_shape == null:
@@ -360,8 +365,9 @@ func _collect(node: Node, xform: Transform3D, template: PieceTemplate) -> void:
 			template.center = child_xform.origin
 			if shape is BoxShape3D:
 				var box := shape.duplicate() as BoxShape3D
-				box.size = Vector3(maxf(box.size.x - 0.1, 0.01), maxf(box.size.y - 0.1, 0.01),
-						maxf(box.size.z - 0.1, 0.01))
+				var shrink := overlap_tolerance * 2.0
+				box.size = Vector3(maxf(box.size.x - shrink, 0.01), maxf(box.size.y - shrink, 0.01),
+						maxf(box.size.z - shrink, 0.01))
 				template.query_shape = box
 				template.radius = maxf(box.size.x, maxf(box.size.y, box.size.z)) * 0.5
 			else:
