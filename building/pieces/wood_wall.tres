@@ -17,3 +17,4 @@ display_name = "Wood Wall"
 scene = ExtResource("3_scene")
 cost = Array[ExtResource("2_amount")]([SubResource("Resource_wood")])
 sort_order = 2
+align_to_floor_edges = true

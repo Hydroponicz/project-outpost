@@ -142,6 +142,13 @@ func _compute_placement(hit: Dictionary) -> Transform3D:
 	var placement := Transform3D(rotation_basis, hit_pos)  # Free placement on the ground.
 
 	var target := BuildPiece.find_on(hit.collider)
+	var hit_normal: Vector3 = hit.normal
+	# Walls aimed at the top of a floor: go to its nearest edge, lined up.
+	if target != null and selected.align_to_floor_edges and hit_normal.y > 0.7:
+		var edge := _floor_edge_placement(target, hit_pos)
+		if edge != Transform3D.IDENTITY:
+			return edge
+
 	var template: PieceTemplate = _templates[selected]
 	if target == null or template.snaps.is_empty():
 		return placement
@@ -158,7 +165,6 @@ func _compute_placement(hit: Dictionary) -> Transform3D:
 	# 2. Try lining up each of the ghost's snap points with it. Prefer the one
 	#    that puts the piece on the side we're aiming from, and that doesn't
 	#    overlap anything.
-	var hit_normal: Vector3 = hit.normal
 	var desired_center := hit_pos + hit_normal * template.radius
 	var best_score := INF
 	for snap in template.snaps:
@@ -171,6 +177,40 @@ func _compute_placement(hit: Dictionary) -> Transform3D:
 			best_score = score
 			placement = candidate
 	return placement
+
+
+## Placement on the edge of a floor-like piece nearest to "aim", turned to
+## run along that edge. Returns IDENTITY if the target isn't floor-shaped.
+func _floor_edge_placement(target: BuildPiece, aim: Vector3) -> Transform3D:
+	var root := target.get_parent() as Node3D
+	var to_local := root.global_transform.affine_inverse()
+
+	# The floor's size, from its snap points (in its own local space).
+	var half_x := 0.0
+	var half_z := 0.0
+	var top := -INF
+	for point in target.get_snap_points():
+		var local := to_local * point
+		half_x = maxf(half_x, absf(local.x))
+		half_z = maxf(half_z, absf(local.z))
+		top = maxf(top, local.y)
+	if half_x < 0.1 or half_z < 0.1:
+		return Transform3D.IDENTITY  # Not floor-shaped (e.g. a wall).
+
+	# Which edge is closest to where we're aiming?
+	var aim_local := to_local * aim
+	var edge_mid: Vector3
+	var turn := 0.0
+	if half_x - absf(aim_local.x) < half_z - absf(aim_local.z):
+		edge_mid = Vector3(signf(aim_local.x) * half_x, top, 0.0)  # Left/right edge,
+		turn = PI * 0.5  # which runs front-to-back, so turn the wall 90 degrees.
+	else:
+		edge_mid = Vector3(0.0, top, signf(aim_local.z) * half_z)  # Front/back edge.
+	if edge_mid.x == 0.0 and edge_mid.z == 0.0:
+		edge_mid.z = half_z  # Aiming at the exact center: pick one.
+
+	var root_basis := root.global_transform.basis.orthonormalized()
+	return Transform3D(root_basis * Basis(Vector3.UP, turn), root.global_transform * edge_mid)
 
 
 ## True if the selected piece at "xform" would overlap the world or the player.

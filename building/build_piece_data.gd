@@ -18,3 +18,6 @@ extends Resource
 @export var cost: Array[ItemAmount] = []
 ## Position in the build menu (lower = higher up).
 @export var sort_order: int = 0
+## Walls etc.: when aimed anywhere on top of a floor, jump to the floor's
+## nearest edge and turn to line up with it (no manual rotating needed).
+@export var align_to_floor_edges: bool = false
