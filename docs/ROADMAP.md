@@ -23,8 +23,8 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 3. [x] Resources and gathering
 4. [x] Inventory
 5. [x] Crafting: recipes by hand and at stations (test workbench placed in the level)
-6. [ ] Tools: hotbar, axe/pickaxe required for trees/rocks, durability with free repair, forage  ← current
-7. [ ] Building (the workbench becomes buildable here)
+6. [x] Tools: hotbar, axe/pickaxe required for trees/rocks, durability with free repair, forage
+7. [ ] Building (the workbench becomes buildable here)  ← next
 8. [ ] Survival pressure (health, hunger, stamina)
 9. [ ] Workers v1: one worker gathers into a chest
 10. [ ] Production chains: workers run timed processing stations
