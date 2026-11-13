@@ -31,6 +31,14 @@ extends CharacterBody3D
 ## 1 = same as rising. Higher = snappier landings.
 @export var fall_gravity_multiplier: float = 1.6
 
+@export_group("Falling")
+## Falls shorter than this (in meters) don't hurt.
+@export var safe_fall_height: float = 6.0
+## Damage per meter fallen beyond the safe height.
+@export var fall_damage_per_meter: float = 10.0
+
+const GRAVE_SCENE := preload("res://world/grave.tscn")
+
 ## False while a menu (like the inventory) is open: the character ignores
 ## movement input but still falls and slows to a stop.
 var controls_enabled: bool = true
@@ -45,6 +53,14 @@ var _sprint_toggled: bool = false
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+## Highest point of the current fall (for fall damage).
+var _fall_start_y: float = 0.0
+var _was_on_floor: bool = true
+## Where you come back after dying (where the level placed the player).
+var _spawn_point: Vector3
+## Like _jump_blocked, for eating with the Hit button.
+var _eat_blocked: bool = false
+
 @onready var _visual: Node3D = $Visual
 @onready var _camera_rig: CameraRig = $CameraRig
 @onready var _interactor: Interactor = $Interactor
@@ -54,6 +70,19 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var _hud: HUD = $HUD
 @onready var _builder: Builder = $Builder
 @onready var _inventory_screen: InventoryScreen = $InventoryScreen
+@onready var _vitals: Vitals = $Vitals
+
+
+func _ready() -> void:
+	_spawn_point = global_position
+	_vitals.died.connect(_on_died)
+
+
+func _input(event: InputEvent) -> void:
+	# A click that grabs the mouse back (after Esc / a menu) shouldn't eat.
+	if event is InputEventMouseButton and event.pressed \
+			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		_eat_blocked = true
 
 
 ## Turns player control (movement, camera, hitting, interacting) on or off.
@@ -68,10 +97,15 @@ func set_controls_enabled(enabled: bool) -> void:
 		_sprint_toggled = false
 	else:
 		_jump_blocked = true
+		_eat_blocked = true
 
 
 func get_inventory() -> Inventory:
 	return _inventory
+
+
+func get_vitals() -> Vitals:
+	return _vitals
 
 
 ## Everything about the player that goes in the save file.
@@ -83,6 +117,8 @@ func get_save_data() -> Dictionary:
 		"camera_pitch": _camera_rig.pitch,
 		"hotbar": _hotbar.selected,
 		"inventory": _inventory.get_save_data(),
+		"vitals": _vitals.get_save_data(),
+		"spawn": [_spawn_point.x, _spawn_point.y, _spawn_point.z],
 	}
 
 
@@ -96,6 +132,11 @@ func apply_save_data(data: Dictionary) -> void:
 	_camera_rig.pitch = data.get("camera_pitch", _camera_rig.pitch)
 	_hotbar.select(int(data.get("hotbar", 0)))
 	_inventory.apply_save_data(data.get("inventory", []))
+	_vitals.apply_save_data(data.get("vitals", {}))
+	var spawn: Array = data.get("spawn", [])
+	if spawn.size() == 3:
+		_spawn_point = Vector3(spawn[0], spawn[1], spawn[2])
+	_fall_start_y = global_position.y
 
 
 ## Opens the inventory screen next to a chest (or other container).
@@ -130,7 +171,8 @@ func _physics_process(delta: float) -> void:
 	# Physics formula: the launch speed needed to reach jump_height.
 	if _jump_blocked and not Input.is_action_pressed("jump"):
 		_jump_blocked = false
-	if controls_enabled and not _jump_blocked and Input.is_action_just_pressed("jump") and is_on_floor():
+	if controls_enabled and not _jump_blocked and Input.is_action_just_pressed("jump") and is_on_floor() \
+			and _vitals.use_stamina(_vitals.jump_cost):
 		velocity.y = sqrt(2.0 * gravity * jump_height)
 
 	# --- Read input ---
@@ -157,8 +199,11 @@ func _physics_process(delta: float) -> void:
 	if _inventory.is_overweight():
 		speed = encumbered_speed  # Too heavy: slow, and no sprinting.
 		_sprint_toggled = false
-	elif sprinting:
+	elif sprinting and move_dir.length() > 0.1 \
+			and _vitals.drain_stamina(_vitals.sprint_cost_per_second, delta):
 		speed = sprint_speed
+	elif _vitals.is_exhausted():
+		_sprint_toggled = false  # Out of breath: gamepad sprint switches off.
 	var target_velocity := move_dir * speed
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 
@@ -171,6 +216,8 @@ func _physics_process(delta: float) -> void:
 	velocity.z = horizontal.z
 
 	move_and_slide()
+	_update_fall_damage()
+	_try_eat()
 
 	# --- Face the movement direction ---
 	# Only the visual model turns. The collision capsule is round, so it
@@ -180,3 +227,50 @@ func _physics_process(delta: float) -> void:
 		var target_angle := atan2(-move_dir.x, -move_dir.z)
 		var weight := 1.0 - exp(-turn_speed * delta)
 		_visual.rotation.y = lerp_angle(_visual.rotation.y, target_angle, weight)
+
+
+## Tracks the highest point of a fall, and hurts on landing if it was far.
+func _update_fall_damage() -> void:
+	var on_floor := is_on_floor()
+	if not on_floor:
+		if _was_on_floor:
+			_fall_start_y = global_position.y  # Just left the ground.
+		_fall_start_y = maxf(_fall_start_y, global_position.y)
+	elif not _was_on_floor:
+		var fallen := _fall_start_y - global_position.y
+		if fallen > safe_fall_height:
+			_vitals.damage((fallen - safe_fall_height) * fall_damage_per_meter)
+	_was_on_floor = on_floor
+
+
+## Hit (LMB / RT) with food selected on the hotbar eats one.
+func _try_eat() -> void:
+	if _eat_blocked:
+		if not Input.is_action_pressed("hit"):
+			_eat_blocked = false
+		return
+	if not controls_enabled or not Input.is_action_just_pressed("hit"):
+		return
+	var stack := _hotbar.get_selected_stack()
+	if stack == null or stack.item.hunger_restore <= 0.0:
+		return
+	if _vitals.eat(stack.item):
+		_inventory.remove_item(stack.item, 1)
+	else:
+		show_message("You're not hungry")
+
+
+## Drops everything into a grave where you died, then respawns you.
+func _on_died() -> void:
+	if not _inventory.is_empty():
+		var grave: Grave = GRAVE_SCENE.instantiate()
+		get_tree().current_scene.add_child(grave)
+		grave.global_position = global_position
+		grave.take_all_from(_inventory)
+
+	global_position = _spawn_point
+	velocity = Vector3.ZERO
+	reset_physics_interpolation()
+	_fall_start_y = global_position.y
+	_vitals.reset(0.5)  # Back with full health and stamina, half hunger.
+	show_message("You died. Your items are in your grave.")

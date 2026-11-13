@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://building/builder.gd" id="11_builder"]
 [ext_resource type="PackedScene" path="res://ui/build_menu.tscn" id="12_build_menu"]
 [ext_resource type="PackedScene" path="res://ui/pause_menu.tscn" id="13_pause_menu"]
+[ext_resource type="Script" path="res://player/vitals.gd" id="14_vitals"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -46,6 +47,9 @@ script = ExtResource("1_player")
 
 [node name="Inventory" type="Node" parent="." unique_id=2055477740]
 script = ExtResource("6_inventory")
+
+[node name="Vitals" type="Node" parent="."]
+script = ExtResource("14_vitals")
 
 [node name="Hotbar" type="Node" parent="." node_paths=PackedStringArray("inventory")]
 script = ExtResource("9_hotbar")
@@ -89,11 +93,12 @@ margin = 0.1
 current = true
 fov = 70.0
 
-[node name="Interactor" type="Node" parent="." unique_id=1526039786 node_paths=PackedStringArray("camera", "body", "hotbar")]
+[node name="Interactor" type="Node" parent="." unique_id=1526039786 node_paths=PackedStringArray("camera", "body", "hotbar", "vitals")]
 script = ExtResource("3_interactor")
 camera = NodePath("../CameraRig/PitchPivot/SpringArm3D/Camera3D")
 body = NodePath("..")
 hotbar = NodePath("../Hotbar")
+vitals = NodePath("../Vitals")
 
 [node name="ItemCollector" type="Area3D" parent="." unique_id=948616714 node_paths=PackedStringArray("inventory")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -105,12 +110,13 @@ inventory = NodePath("../Inventory")
 [node name="PickupRange" type="CollisionShape3D" parent="ItemCollector" unique_id=669767707]
 shape = SubResource("SphereShape3D_pickup_range")
 
-[node name="HUD" parent="." unique_id=1625009259 node_paths=PackedStringArray("interactor", "collector", "inventory", "hotbar", "builder") instance=ExtResource("4_hud")]
+[node name="HUD" parent="." unique_id=1625009259 node_paths=PackedStringArray("interactor", "collector", "inventory", "hotbar", "builder", "vitals") instance=ExtResource("4_hud")]
 interactor = NodePath("../Interactor")
 collector = NodePath("../ItemCollector")
 inventory = NodePath("../Inventory")
 hotbar = NodePath("../Hotbar")
 builder = NodePath("../Builder")
+vitals = NodePath("../Vitals")
 
 [node name="Builder" type="Node" parent="." node_paths=PackedStringArray("camera", "body", "hotbar", "inventory", "camera_rig", "build_menu")]
 script = ExtResource("11_builder")

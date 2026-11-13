@@ -14,6 +14,7 @@ const HOTBAR_SLOT_SIZE := Vector2(72, 72)
 @export var inventory: Inventory
 @export var hotbar: Hotbar
 @export var builder: Builder
+@export var vitals: Vitals
 ## How long messages like "Inventory full" stay on screen, in seconds.
 @export var message_duration: float = 2.0
 
@@ -28,6 +29,9 @@ var _hotbar_slots: Array[InventorySlot] = []
 @onready var _status: Label = $Status
 @onready var _hotbar_row: HBoxContainer = $Hotbar
 @onready var _build_hint: Label = $BuildHint
+@onready var _health_bar: ProgressBar = $Vitals/Health/Bar
+@onready var _stamina_bar: ProgressBar = $Vitals/Stamina/Bar
+@onready var _hunger_bar: ProgressBar = $Vitals/Hunger/Bar
 
 
 func _ready() -> void:
@@ -49,6 +53,8 @@ func _ready() -> void:
 	hotbar.selection_changed.connect(_on_hotbar_selection_changed)
 	InputPrompts.device_changed.connect(_on_device_changed)
 	builder.hint_changed.connect(_on_build_hint_changed)
+	vitals.changed.connect(_on_vitals_changed)
+	_on_vitals_changed()
 	_on_build_hint_changed("")
 	_on_target_changed(null)
 	_on_inventory_changed()
@@ -106,6 +112,19 @@ func _on_inventory_changed() -> void:
 func _on_hotbar_selection_changed(_index: int) -> void:
 	_refresh_hotbar()
 	_refresh_prompt_text()
+
+
+func _on_vitals_changed() -> void:
+	_health_bar.max_value = vitals.max_health
+	_health_bar.value = vitals.health
+	_stamina_bar.max_value = vitals.max_stamina
+	_stamina_bar.value = vitals.stamina
+	# Stamina bar dims while exhausted (can't sprint / swing / jump yet).
+	_stamina_bar.modulate.a = 0.45 if vitals.is_exhausted() else 1.0
+	_hunger_bar.max_value = vitals.max_hunger
+	_hunger_bar.value = vitals.hunger
+	# Hunger bar turns red when hungry.
+	_hunger_bar.modulate = Color(1, 0.5, 0.5) if vitals.is_hungry() else Color.WHITE
 
 
 func _on_build_hint_changed(text: String) -> void:

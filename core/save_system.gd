@@ -19,6 +19,7 @@ const SAVE_VERSION := 1
 const WORLD_SCENE := "res://world/test_level.tscn"
 const TITLE_SCENE := "res://ui/title_screen.tscn"
 const PICKUP_SCENE := preload("res://items/item_pickup.tscn")
+const GRAVE_SCENE := preload("res://world/grave.tscn")
 
 ## Seconds between autosaves.
 var autosave_interval: float = 300.0
@@ -151,6 +152,13 @@ func _collect(world: World) -> Dictionary:
 				"durability": pickup.durability, "position": [pos.x, pos.y, pos.z]})
 	data["items"] = items
 
+	# Graves (where you died, with your stuff in them).
+	var graves: Array = []
+	for node in get_tree().get_nodes_in_group(Grave.GROUP):
+		if not node.is_queued_for_deletion():
+			graves.append((node as Grave).get_save_data())
+	data["graves"] = graves
+
 	return data
 
 
@@ -204,6 +212,11 @@ func _load_into(world: World) -> void:
 		world.add_child(pickup)
 		var pos: Array = entry.get("position", [0, 0, 0])
 		pickup.global_position = Vector3(pos[0], pos[1], pos[2])
+
+	for entry: Dictionary in data.get("graves", []):
+		var grave: Grave = GRAVE_SCENE.instantiate()
+		world.add_child(grave)
+		grave.apply_save_data(entry)
 
 
 # --- Helpers ---

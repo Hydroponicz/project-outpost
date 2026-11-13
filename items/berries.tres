@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"berries"
+display_name = "Berries"
+max_stack = 50
+weight = 0.1
+drop_color = Color(0.75, 0.15, 0.25, 1)
+hunger_restore = 15.0
