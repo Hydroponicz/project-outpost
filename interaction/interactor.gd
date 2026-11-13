@@ -96,6 +96,8 @@ func _try_hit() -> void:
 
 	if not holding or _cooldown_left > 0.0 or target == null:
 		return
+	if hotbar.is_holding(&"hammer"):
+		return  # With the hammer, Hit places build pieces instead.
 	var hittable := Hittable.find_on(target)
 	if hittable == null:
 		return

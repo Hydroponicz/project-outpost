@@ -78,6 +78,8 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# _input runs before the GUI, so Tab isn't eaten by focus navigation.
 	if event.is_action_pressed("inventory"):
+		if not is_open and not player.controls_enabled:
+			return  # Another menu (e.g. the build menu) is open.
 		if is_open:
 			close()
 		else:

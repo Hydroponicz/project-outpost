@@ -50,6 +50,12 @@ func get_held_tool() -> ItemStack:
 	return null
 
 
+## True if the selected slot holds a tool of this type (e.g. "hammer").
+func is_holding(tool_type: StringName) -> bool:
+	var held := get_held_tool()
+	return held != null and held.item.tool_type == tool_type
+
+
 ## Why the held tool can't be used on something needing "required_tool",
 ## e.g. "Needs an Axe". Empty string = good to go.
 func get_tool_problem(required_tool: StringName) -> String:

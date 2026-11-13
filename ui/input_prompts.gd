@@ -47,6 +47,7 @@ func _mouse_button_name(index: int) -> String:
 		MOUSE_BUTTON_LEFT: return "LMB"
 		MOUSE_BUTTON_RIGHT: return "RMB"
 		MOUSE_BUTTON_MIDDLE: return "MMB"
+		MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN: return "Scroll"
 	return "Mouse %d" % index
 
 
@@ -65,6 +66,9 @@ func _joy_button_name(index: int) -> String:
 		JOY_BUTTON_B: return "Circle" if ps else "B"
 		JOY_BUTTON_X: return "Square" if ps else "X"
 		JOY_BUTTON_Y: return "Triangle" if ps else "Y"
+		JOY_BUTTON_LEFT_SHOULDER: return "L1" if ps else "LB"
+		JOY_BUTTON_RIGHT_SHOULDER: return "R1" if ps else "RB"
+		JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN: return "D-pad"
 	return "Button %d" % index
 
 

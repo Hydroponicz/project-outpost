@@ -48,6 +48,7 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var _collector: ItemCollector = $ItemCollector
 @onready var _hotbar: Hotbar = $Hotbar
 @onready var _hud: HUD = $HUD
+@onready var _builder: Builder = $Builder
 
 
 ## Turns player control (movement, camera, hitting, interacting) on or off.
@@ -57,6 +58,7 @@ func set_controls_enabled(enabled: bool) -> void:
 	_camera_rig.input_enabled = enabled
 	_interactor.enabled = enabled
 	_hotbar.enabled = enabled
+	_builder.enabled = enabled
 	if not enabled:
 		_sprint_toggled = false
 

@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://crafting/crafter.gd" id="8_crafter"]
 [ext_resource type="Script" path="res://player/hotbar.gd" id="9_hotbar"]
 [ext_resource type="Script" path="res://player/held_item_view.gd" id="10_held_item"]
+[ext_resource type="Script" path="res://building/builder.gd" id="11_builder"]
+[ext_resource type="PackedScene" path="res://ui/build_menu.tscn" id="12_build_menu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -102,11 +104,21 @@ inventory = NodePath("../Inventory")
 [node name="PickupRange" type="CollisionShape3D" parent="ItemCollector" unique_id=669767707]
 shape = SubResource("SphereShape3D_pickup_range")
 
-[node name="HUD" parent="." unique_id=1625009259 node_paths=PackedStringArray("interactor", "collector", "inventory", "hotbar") instance=ExtResource("4_hud")]
+[node name="HUD" parent="." unique_id=1625009259 node_paths=PackedStringArray("interactor", "collector", "inventory", "hotbar", "builder") instance=ExtResource("4_hud")]
 interactor = NodePath("../Interactor")
 collector = NodePath("../ItemCollector")
 inventory = NodePath("../Inventory")
 hotbar = NodePath("../Hotbar")
+builder = NodePath("../Builder")
+
+[node name="Builder" type="Node" parent="." node_paths=PackedStringArray("camera", "body", "hotbar", "inventory", "camera_rig", "build_menu")]
+script = ExtResource("11_builder")
+camera = NodePath("../CameraRig/PitchPivot/SpringArm3D/Camera3D")
+body = NodePath("..")
+hotbar = NodePath("../Hotbar")
+inventory = NodePath("../Inventory")
+camera_rig = NodePath("../CameraRig")
+build_menu = NodePath("../BuildMenu")
 
 [node name="Crafter" type="Node" parent="." node_paths=PackedStringArray("inventory", "body")]
 script = ExtResource("8_crafter")
@@ -117,3 +129,8 @@ body = NodePath("..")
 player = NodePath("..")
 inventory = NodePath("../Inventory")
 crafter = NodePath("../Crafter")
+
+[node name="BuildMenu" parent="." node_paths=PackedStringArray("player", "builder", "inventory") instance=ExtResource("12_build_menu")]
+player = NodePath("..")
+builder = NodePath("../Builder")
+inventory = NodePath("../Inventory")

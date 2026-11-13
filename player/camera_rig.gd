@@ -46,6 +46,8 @@ var pitch: float = deg_to_rad(-15.0)
 
 ## False while a menu is open: the camera stops reacting to look/zoom input.
 var input_enabled: bool = true
+## True while placing a build piece: the scroll wheel rotates the piece instead.
+var scroll_zoom_locked: bool = false
 
 var _target_distance: float
 
@@ -90,7 +92,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		pitch -= deg_to_rad(event.relative.y * mouse_sensitivity) * y_sign
 
 	# Zoom (mouse wheel, one step per click).
-	if event.is_action_pressed("zoom_in"):
+	if scroll_zoom_locked:
+		pass
+	elif event.is_action_pressed("zoom_in"):
 		_target_distance -= zoom_step
 	elif event.is_action_pressed("zoom_out"):
 		_target_distance += zoom_step
