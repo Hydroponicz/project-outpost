@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://crafting/recipe_data.gd" id="1_recipe"]
+[ext_resource type="Script" path="res://crafting/item_amount.gd" id="2_amount"]
+[ext_resource type="Resource" path="res://items/stone_pickaxe.tres" id="3_output"]
+[ext_resource type="Resource" path="res://items/wood.tres" id="4_wood"]
+[ext_resource type="Resource" path="res://items/stone.tres" id="5_stone"]
+
+[sub_resource type="Resource" id="Resource_wood"]
+script = ExtResource("2_amount")
+item = ExtResource("4_wood")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_stone"]
+script = ExtResource("2_amount")
+item = ExtResource("5_stone")
+amount = 3
+
+[resource]
+script = ExtResource("1_recipe")
+output = ExtResource("3_output")
+output_amount = 1
+ingredients = Array[ExtResource("2_amount")]([SubResource("Resource_wood"), SubResource("Resource_stone")])
+station = &"workbench"

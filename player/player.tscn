@@ -1,12 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bdbfpdt58geb0"]
 
-[ext_resource type="Script" path="res://player/player.gd" id="1_player"]
-[ext_resource type="Script" path="res://player/camera_rig.gd" id="2_camera"]
-[ext_resource type="Script" path="res://interaction/interactor.gd" id="3_interactor"]
+[ext_resource type="Script" uid="uid://1unl2m2sujlv" path="res://player/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://c5bngya08stma" path="res://player/camera_rig.gd" id="2_camera"]
+[ext_resource type="Script" uid="uid://bykjwj5pc2ul5" path="res://interaction/interactor.gd" id="3_interactor"]
 [ext_resource type="PackedScene" path="res://ui/hud.tscn" id="4_hud"]
-[ext_resource type="Script" path="res://items/item_collector.gd" id="5_collector"]
-[ext_resource type="Script" path="res://inventory/inventory.gd" id="6_inventory"]
+[ext_resource type="Script" uid="uid://cg047kxancies" path="res://items/item_collector.gd" id="5_collector"]
+[ext_resource type="Script" uid="uid://bjcfafm0igvb0" path="res://inventory/inventory.gd" id="6_inventory"]
 [ext_resource type="PackedScene" path="res://ui/inventory_screen.tscn" id="7_inventory_screen"]
+[ext_resource type="Script" path="res://crafting/crafter.gd" id="8_crafter"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
@@ -33,66 +34,72 @@ radius = 0.2
 [sub_resource type="SphereShape3D" id="SphereShape3D_pickup_range"]
 radius = 2.5
 
-[node name="Player" type="CharacterBody3D"]
+[node name="Player" type="CharacterBody3D" unique_id=802821426]
 collision_layer = 2
 floor_snap_length = 0.3
 script = ExtResource("1_player")
 
-[node name="Inventory" type="Node" parent="."]
+[node name="Inventory" type="Node" parent="." unique_id=2055477740]
 script = ExtResource("6_inventory")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=868599940]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_body")
 
-[node name="Visual" type="Node3D" parent="."]
+[node name="Visual" type="Node3D" parent="." unique_id=890857638]
 
-[node name="Body" type="MeshInstance3D" parent="Visual"]
+[node name="Body" type="MeshInstance3D" parent="Visual" unique_id=944986523]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 mesh = SubResource("CapsuleMesh_body")
 
-[node name="Nose" type="MeshInstance3D" parent="Visual"]
+[node name="Nose" type="MeshInstance3D" parent="Visual" unique_id=585945528]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, -0.4)
 mesh = SubResource("BoxMesh_nose")
 
-[node name="CameraRig" type="Node3D" parent="." node_paths=PackedStringArray("target")]
+[node name="CameraRig" type="Node3D" parent="." unique_id=1084577326 node_paths=PackedStringArray("target")]
 physics_interpolation_mode = 2
-top_level = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+top_level = true
 script = ExtResource("2_camera")
 target = NodePath("..")
 
-[node name="PitchPivot" type="Node3D" parent="CameraRig"]
+[node name="PitchPivot" type="Node3D" parent="CameraRig" unique_id=1167150602]
 
-[node name="SpringArm3D" type="SpringArm3D" parent="CameraRig/PitchPivot"]
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraRig/PitchPivot" unique_id=740611417]
 shape = SubResource("SphereShape3D_camera")
 spring_length = 4.5
 margin = 0.1
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig/PitchPivot/SpringArm3D"]
+[node name="Camera3D" type="Camera3D" parent="CameraRig/PitchPivot/SpringArm3D" unique_id=381560611]
 current = true
 fov = 70.0
 
-[node name="Interactor" type="Node" parent="." node_paths=PackedStringArray("camera", "body")]
+[node name="Interactor" type="Node" parent="." unique_id=1526039786 node_paths=PackedStringArray("camera", "body")]
 script = ExtResource("3_interactor")
 camera = NodePath("../CameraRig/PitchPivot/SpringArm3D/Camera3D")
 body = NodePath("..")
 
-[node name="ItemCollector" type="Area3D" parent="." node_paths=PackedStringArray("inventory")]
+[node name="ItemCollector" type="Area3D" parent="." unique_id=948616714 node_paths=PackedStringArray("inventory")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("5_collector")
 inventory = NodePath("../Inventory")
 
-[node name="PickupRange" type="CollisionShape3D" parent="ItemCollector"]
+[node name="PickupRange" type="CollisionShape3D" parent="ItemCollector" unique_id=669767707]
 shape = SubResource("SphereShape3D_pickup_range")
 
-[node name="HUD" parent="." node_paths=PackedStringArray("interactor", "collector", "inventory") instance=ExtResource("4_hud")]
+[node name="HUD" parent="." unique_id=1625009259 node_paths=PackedStringArray("interactor", "collector", "inventory") instance=ExtResource("4_hud")]
 interactor = NodePath("../Interactor")
 collector = NodePath("../ItemCollector")
 inventory = NodePath("../Inventory")
 
-[node name="InventoryScreen" parent="." node_paths=PackedStringArray("player", "inventory") instance=ExtResource("7_inventory_screen")]
+[node name="Crafter" type="Node" parent="." node_paths=PackedStringArray("inventory", "body")]
+script = ExtResource("8_crafter")
+inventory = NodePath("../Inventory")
+body = NodePath("..")
+
+[node name="InventoryScreen" parent="." unique_id=297101874 node_paths=PackedStringArray("player", "inventory", "crafter") instance=ExtResource("7_inventory_screen")]
 player = NodePath("..")
 inventory = NodePath("../Inventory")
+crafter = NodePath("../Crafter")

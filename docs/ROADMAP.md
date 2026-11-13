@@ -13,18 +13,20 @@ Rule: every new idea must support this loop. If it doesn't, it goes to "Later, m
 - Goal: commercially viable 1.0
 - Resources do not regrow by themselves; trees are replanted by the player (later)
 - Dropped items are separate pieces, auto-vacuumed into the player when in range
+- Crafting is instant and done by the player; timed processing (smelting etc.) is for workers
 
 ## Systems (built in order, each one finished before the next)
 1. [x] Player controller: movement, camera, jump, sprint
 2. [x] Interaction: look at a thing, press a key
 3. [x] Resources and gathering
 4. [x] Inventory
-5. [ ] Crafting (by hand, then at stations)  ← next
-6. [ ] Building
-7. [ ] Survival pressure (health, hunger, stamina)
-8. [ ] Workers v1: one worker gathers into a chest
-9. [ ] Production chains: workers run stations
-10. [ ] Recruitment
+5. [x] Crafting: recipes by hand and at stations (test workbench placed in the level)
+6. [ ] Tools: equipping and using crafted tools (axe, pickaxe)  ← next
+7. [ ] Building (the workbench becomes buildable here)
+8. [ ] Survival pressure (health, hunger, stamina)
+9. [ ] Workers v1: one worker gathers into a chest
+10. [ ] Production chains: workers run timed processing stations
+11. [ ] Recruitment
 
 ## Later, maybe (not now)
 - Replanting trees from saplings/seeds (trees never regrow on their own; also a worker job)
